@@ -1,4 +1,4 @@
-package com.example.stats
+package com.example.stats.ui.bottombar
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.example.stats.R
+import com.example.stats.StatsAppScreen
 
 @Composable
 fun BottomBar(

@@ -1,4 +1,4 @@
-package com.example.stats
+package com.example.stats.ui.topbar.pages
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

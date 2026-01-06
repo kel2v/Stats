@@ -12,6 +12,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.stats.ui.bottombar.BottomBar
+import com.example.stats.ui.bottombar.pages.Battery
+import com.example.stats.ui.bottombar.pages.Network
+import com.example.stats.ui.bottombar.pages.Dashboard
+import com.example.stats.ui.topbar.pages.Licenses
+import com.example.stats.ui.topbar.pages.Premium
+import com.example.stats.ui.topbar.pages.PrivacyPolicy
+import com.example.stats.ui.topbar.pages.Settings
+import com.example.stats.ui.topbar.TopBar
 
 enum class StatsAppScreen(@StringRes val title: Int) {
     Dashboard(title = R.string.dashboard_page_title),
@@ -75,7 +84,7 @@ fun StatsApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = StatsAppScreen.Dashboard.name) {
-                Summary()
+                Dashboard()
             }
 
             composable(route = StatsAppScreen.Battery.name) {
@@ -141,7 +150,7 @@ fun StatsAppPreview(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = StatsAppScreen.Dashboard.name) {
-                Summary()
+                Dashboard()
             }
 
             composable(route = StatsAppScreen.Battery.name) {

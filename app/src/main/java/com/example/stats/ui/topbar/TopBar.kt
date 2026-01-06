@@ -1,4 +1,4 @@
-package com.example.stats
+package com.example.stats.ui.topbar
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.stats.R
+import com.example.stats.StatsAppScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,13 +37,13 @@ fun TopBar(
 ) {
     CenterAlignedTopAppBar(
         navigationIcon = {
-            if(canNavigateBack) {
+            if (canNavigateBack) {
                 NavBackIcon(navigateUp)
             }
         },
         title = { PageTitle(stringResource(currentScreen.title)) },
         actions = {
-            if(currentScreen != StatsAppScreen.Premium) PremiumIcon(navigatePremium)
+            if (currentScreen != StatsAppScreen.Premium) PremiumIcon(navigatePremium)
             OptionsIcon(
                 currentScreen = currentScreen,
                 navigateSettings = navigateSettings,
@@ -105,9 +107,9 @@ fun OptionsIcon(
 
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = {expanded = false}
+                onDismissRequest = { expanded = false }
             ) {
-                if(currentScreen != StatsAppScreen.Settings) {
+                if (currentScreen != StatsAppScreen.Settings) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.settings_option)) },
                         onClick = {
@@ -117,7 +119,7 @@ fun OptionsIcon(
                     )
                 }
 
-                if(currentScreen != StatsAppScreen.PrivacyPolicy) {
+                if (currentScreen != StatsAppScreen.PrivacyPolicy) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.privacy_policy_option)) },
                         onClick = {
@@ -127,7 +129,7 @@ fun OptionsIcon(
                     )
                 }
 
-                if(currentScreen != StatsAppScreen.Licenses) {
+                if (currentScreen != StatsAppScreen.Licenses) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.licenses_option)) },
                         onClick = {
@@ -143,7 +145,6 @@ fun OptionsIcon(
 }
 
 
-
 @Composable
 @Preview(showBackground = true)
 fun OptionsIconExpandedPreview() {
@@ -153,7 +154,7 @@ fun OptionsIconExpandedPreview() {
         var expanded by remember { mutableStateOf(true) }
 
         Box(
-            modifier = Modifier
+            modifier = Modifier.Companion
         ) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
@@ -162,8 +163,8 @@ fun OptionsIconExpandedPreview() {
 
             DropdownMenu(
                 expanded = true,
-                onDismissRequest = {expanded = false},
-                modifier = Modifier.fillMaxSize()
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.Companion.fillMaxSize()
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.settings_option)) },
@@ -201,7 +202,7 @@ fun OptionsIconNotExpandedPreview() {
         onClick = {}
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.Companion.fillMaxSize()
         ) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
@@ -210,8 +211,8 @@ fun OptionsIconNotExpandedPreview() {
 
             DropdownMenu(
                 expanded = false,
-                onDismissRequest = {expanded = false},
-                modifier = Modifier.fillMaxSize()
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.Companion.fillMaxSize()
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.settings_option)) },
