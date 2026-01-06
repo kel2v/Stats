@@ -24,25 +24,38 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar() {
+fun TopBar(
+    canNavigateBack: Boolean,
+    currentScreen: StatsAppScreen,
+    navigateUp: () -> Unit,
+    navigatePremium: () -> Unit,
+    navigateSettings: () -> Unit,
+    navigatePrivacyPolicy: () -> Unit,
+    navigateLicenses: () -> Unit
+) {
     CenterAlignedTopAppBar(
-        navigationIcon = { NavBackIcon() },
-        title = { PageTitle() },
+        navigationIcon = {
+            if(canNavigateBack) {
+                NavBackIcon(navigateUp)
+            }
+        },
+        title = { PageTitle(stringResource(currentScreen.title)) },
         actions = {
-            PremiumIcon()
+            if(currentScreen != StatsAppScreen.Premium) PremiumIcon(navigatePremium)
             OptionsIcon(
-                onSettings = {},
-                onPrivacyPolicy = {},
-                onLicenses = {}
+                currentScreen = currentScreen,
+                navigateSettings = navigateSettings,
+                navigatePrivacyPolicy = navigatePrivacyPolicy,
+                navigateLicenses = navigateLicenses
             )
         }
     )
 }
 
 @Composable
-fun NavBackIcon() {
+fun NavBackIcon(navigateUp: () -> Unit) {
     IconButton(
-        onClick = {}
+        onClick = navigateUp
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -52,14 +65,14 @@ fun NavBackIcon() {
 }
 
 @Composable
-fun PageTitle() {
-    Text("Page Title")
+fun PageTitle(title: String) {
+    Text(title)
 }
 
 @Composable
-fun PremiumIcon() {
+fun PremiumIcon(onClick: () -> Unit) {
     IconButton(
-        onClick = {}
+        onClick = onClick
     ) {
         Icon(
             imageVector = Icons.Default.Star,
@@ -70,9 +83,10 @@ fun PremiumIcon() {
 
 @Composable
 fun OptionsIcon(
-    onSettings: () -> Unit,
-    onPrivacyPolicy: () -> Unit,
-    onLicenses: () -> Unit,
+    currentScreen: StatsAppScreen,
+    navigateSettings: () -> Unit,
+    navigatePrivacyPolicy: () -> Unit,
+    navigateLicenses: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -93,29 +107,35 @@ fun OptionsIcon(
                 expanded = expanded,
                 onDismissRequest = {expanded = false}
             ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.settings_option)) },
-                    onClick = {
-                        expanded = false
-                        onSettings()
-                    }
-                )
+                if(currentScreen != StatsAppScreen.Settings) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.settings_option)) },
+                        onClick = {
+                            expanded = false
+                            navigateSettings()
+                        }
+                    )
+                }
 
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.privacy_policy_option)) },
-                    onClick = {
-                        expanded = false
-                        onPrivacyPolicy()
-                    }
-                )
+                if(currentScreen != StatsAppScreen.PrivacyPolicy) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.privacy_policy_option)) },
+                        onClick = {
+                            expanded = false
+                            navigatePrivacyPolicy()
+                        }
+                    )
+                }
 
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.licenses_option)) },
-                    onClick = {
-                        expanded = false
-                        onLicenses()
-                    }
-                )
+                if(currentScreen != StatsAppScreen.Licenses) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.licenses_option)) },
+                        onClick = {
+                            expanded = false
+                            navigateLicenses()
+                        }
+                    )
+                }
             }
         }
 

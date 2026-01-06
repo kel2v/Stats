@@ -3,9 +3,17 @@
     <string name="nav_back_icon">Navigate back to previous page</string>
     <string name="premium_icon">Upgrade to Premium</string>
     <string name="menu_icon">Menu</string>
-    <string name="battery_menu">Battery</string>
-    <string name="network_menu">Network</string>
+    <string name="battery_button">Battery</string>
+    <string name="network_button">Network</string>
+    <string name="dashboard_button">Dashboard</string>
     <string name="settings_option">Settings</string>
     <string name="privacy_policy_option">Privacy Policy</string>
     <string name="licenses_option">Licenses</string>
+    <string name="dashboard_page_title">Dashboard</string>
+    <string name="battery_page_title">Battery</string>
+    <string name="network_page_title">Network</string>
+    <string name="premium_page_title">Premium</string>
+    <string name="settings_page_title">Settings</string>
+    <string name="privacy_policy_page_title">Privacy Policy</string>
+    <string name="licenses_page_title">Licenses</string>
 </resources>

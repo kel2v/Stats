@@ -8,41 +8,56 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun BottomBar() {
+fun BottomBar(
+    navigateDashboard: () -> Unit,
+    navigateBattery: () -> Unit,
+    navigateNetwork: () -> Unit
+) {
     BottomAppBar {
         Row {
-            Battery()
-            Network()
+            BottomButton(
+                name = stringResource(R.string.dashboard_button),
+                route = StatsAppScreen.Dashboard.name,
+                fontSize = 20.sp,
+                onClick = navigateDashboard
+            )
+
+            BottomButton(
+                name = stringResource(R.string.battery_button),
+                route = StatsAppScreen.Battery.name,
+                fontSize = 20.sp,
+                onClick = navigateBattery
+            )
+
+            BottomButton(
+                name = stringResource(R.string.network_button),
+                route = StatsAppScreen.Network.name,
+                fontSize = 20.sp,
+                onClick = navigateNetwork
+            )
         }
 
     }
 }
 
 @Composable
-fun RowScope.Battery() {
+fun RowScope.BottomButton(
+    name: String,
+    route: String,
+    fontSize: TextUnit,
+    onClick: () -> Unit
+) {
     TextButton(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier.weight(1f)
     ) {
         Text(
-            text = stringResource(R.string.battery_menu),
-            fontSize = 20.sp
-        )
-    }
-}
-
-@Composable
-fun RowScope.Network() {
-    TextButton(
-        onClick = {},
-        modifier = Modifier.weight(1f)
-    ) {
-        Text(
-            text = stringResource(R.string.network_menu),
-            fontSize = 20.sp
+            text = name,
+            fontSize = fontSize
         )
     }
 }
