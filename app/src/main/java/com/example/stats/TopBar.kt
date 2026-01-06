@@ -1,6 +1,14 @@
 package com.example.stats
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -20,7 +28,14 @@ fun TopBar() {
 
 @Composable
 fun NavBackIcon() {
-    Text("NBI")
+    IconButton(
+        onClick = {}
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Navigate back to previous page"
+        )
+    }
 }
 
 @Composable
@@ -30,10 +45,24 @@ fun PageTitle() {
 
 @Composable
 fun PremiumIcon() {
-    Text("PI")
+    IconButton(
+        onClick = {}
+    ) {
+        Icon(
+            imageVector = Icons.Default.Star,
+            contentDescription = "Upgrade to Premium"
+        )
+    }
 }
 
 @Composable
 fun OptionsIcon() {
-    Text("OI")
+    IconButton(
+        onClick = {}
+    ) {
+        Icon(
+            imageVector = Icons.Default.Menu,
+            contentDescription = "Menu"
+        )
+    }
 }
