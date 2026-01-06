@@ -1,27 +1,40 @@
 package com.example.stats
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         navigationIcon = { NavBackIcon() },
         title = { PageTitle() },
         actions = {
             PremiumIcon()
-            OptionsIcon()
+            OptionsIcon(
+                onSettings = {},
+                onPrivacyPolicy = {},
+                onLicenses = {}
+            )
         }
     )
 }
@@ -33,7 +46,7 @@ fun NavBackIcon() {
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Navigate back to previous page"
+            contentDescription = stringResource(R.string.nav_back_icon)
         )
     }
 }
@@ -50,19 +63,158 @@ fun PremiumIcon() {
     ) {
         Icon(
             imageVector = Icons.Default.Star,
-            contentDescription = "Upgrade to Premium"
+            contentDescription = stringResource(R.string.premium_icon)
         )
     }
 }
 
 @Composable
-fun OptionsIcon() {
+fun OptionsIcon(
+    onSettings: () -> Unit,
+    onPrivacyPolicy: () -> Unit,
+    onLicenses: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(
+        onClick = {
+            expanded = !expanded
+        }
+    ) {
+
+
+        Box {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.menu_icon)
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {expanded = false}
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.settings_option)) },
+                    onClick = {
+                        expanded = false
+                        onSettings()
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.privacy_policy_option)) },
+                    onClick = {
+                        expanded = false
+                        onPrivacyPolicy()
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.licenses_option)) },
+                    onClick = {
+                        expanded = false
+                        onLicenses()
+                    }
+                )
+            }
+        }
+
+    }
+}
+
+
+
+@Composable
+@Preview(showBackground = true)
+fun OptionsIconExpandedPreview() {
     IconButton(
         onClick = {}
     ) {
-        Icon(
-            imageVector = Icons.Default.Menu,
-            contentDescription = "Menu"
-        )
+        var expanded by remember { mutableStateOf(true) }
+
+        Box(
+            modifier = Modifier
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.menu_icon)
+            )
+
+            DropdownMenu(
+                expanded = true,
+                onDismissRequest = {expanded = false},
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.settings_option)) },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.privacy_policy_option)) },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.licenses_option)) },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+            }
+        }
+
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun OptionsIconNotExpandedPreview() {
+
+    var expanded by remember { mutableStateOf(true) }
+
+    IconButton(
+        onClick = {}
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.menu_icon)
+            )
+
+            DropdownMenu(
+                expanded = false,
+                onDismissRequest = {expanded = false},
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.settings_option)) },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.privacy_policy_option)) },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.licenses_option)) },
+                    onClick = {
+                        expanded = false
+                    }
+                )
+            }
+        }
+
     }
 }

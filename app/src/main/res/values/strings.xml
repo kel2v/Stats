@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Stats</string>
+    <string name="nav_back_icon">Navigate back to previous page</string>
+    <string name="premium_icon">Upgrade to Premium</string>
+    <string name="menu_icon">Menu</string>
+    <string name="battery_menu">Battery</string>
+    <string name="network_menu">Network</string>
+    <string name="settings_option">Settings</string>
+    <string name="privacy_policy_option">Privacy Policy</string>
+    <string name="licenses_option">Licenses</string>
 </resources>
