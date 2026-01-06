@@ -14,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,30 +22,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stats.R
 import com.example.stats.StatsAppScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
-    canNavigateBack: Boolean,
+    topBarViewModel: TopBarViewModel = viewModel(),
     currentScreen: StatsAppScreen,
+    canNavigateUp: Boolean,
     navigateUp: () -> Unit,
     navigatePremium: () -> Unit,
     navigateSettings: () -> Unit,
     navigatePrivacyPolicy: () -> Unit,
     navigateLicenses: () -> Unit
 ) {
+    val uiState = topBarViewModel.uiState.collectAsState()
+
     CenterAlignedTopAppBar(
-        navigationIcon = {
-            if (canNavigateBack) {
-                NavBackIcon(navigateUp)
-            }
-        },
+        navigationIcon = { if (canNavigateUp) { NavBackIcon(navigateUp) } },
         title = { PageTitle(stringResource(currentScreen.title)) },
         actions = {
-            if (currentScreen != StatsAppScreen.Premium) PremiumIcon(navigatePremium)
+            if (currentScreen != StatsAppScreen.Premium) {
+                PremiumIcon(
+                    onClick = navigatePremium
+                )
+            }
             OptionsIcon(
+                isOptionsMenuExpanded = uiState.value.isOptionsMenuExpanded,
+                setExpandedFlag = { value: Boolean -> topBarViewModel.setIsOptionsMenuExpanded(value) },
                 currentScreen = currentScreen,
                 navigateSettings = navigateSettings,
                 navigatePrivacyPolicy = navigatePrivacyPolicy,
@@ -85,16 +92,16 @@ fun PremiumIcon(onClick: () -> Unit) {
 
 @Composable
 fun OptionsIcon(
+    isOptionsMenuExpanded: Boolean,
+    setExpandedFlag: (Boolean) -> Unit,
     currentScreen: StatsAppScreen,
     navigateSettings: () -> Unit,
     navigatePrivacyPolicy: () -> Unit,
     navigateLicenses: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
     IconButton(
         onClick = {
-            expanded = !expanded
+            setExpandedFlag(!isOptionsMenuExpanded)
         }
     ) {
 
@@ -106,14 +113,14 @@ fun OptionsIcon(
             )
 
             DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                expanded = isOptionsMenuExpanded,
+                onDismissRequest = { setExpandedFlag(false) }
             ) {
                 if (currentScreen != StatsAppScreen.Settings) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.settings_option)) },
                         onClick = {
-                            expanded = false
+                            setExpandedFlag(false)
                             navigateSettings()
                         }
                     )
@@ -123,7 +130,7 @@ fun OptionsIcon(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.privacy_policy_option)) },
                         onClick = {
-                            expanded = false
+                            setExpandedFlag(false)
                             navigatePrivacyPolicy()
                         }
                     )
@@ -133,7 +140,7 @@ fun OptionsIcon(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.licenses_option)) },
                         onClick = {
-                            expanded = false
+                            setExpandedFlag(false)
                             navigateLicenses()
                         }
                     )

@@ -14,13 +14,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.stats.ui.bottombar.BottomBar
 import com.example.stats.ui.bottombar.pages.Battery
-import com.example.stats.ui.bottombar.pages.Network
 import com.example.stats.ui.bottombar.pages.Dashboard
+import com.example.stats.ui.bottombar.pages.Network
+import com.example.stats.ui.topbar.TopBar
 import com.example.stats.ui.topbar.pages.Licenses
 import com.example.stats.ui.topbar.pages.Premium
 import com.example.stats.ui.topbar.pages.PrivacyPolicy
 import com.example.stats.ui.topbar.pages.Settings
-import com.example.stats.ui.topbar.TopBar
 
 enum class StatsAppScreen(@StringRes val title: Int) {
     Dashboard(title = R.string.dashboard_page_title),
@@ -35,15 +35,14 @@ enum class StatsAppScreen(@StringRes val title: Int) {
 fun StatsApp(
     navController: NavHostController = rememberNavController()
 ) {
-
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = StatsAppScreen.valueOf(backStackEntry?.destination?.route ?: StatsAppScreen.Dashboard.name)
 
     Scaffold(
         topBar = {
             TopBar(
-                canNavigateBack = navController.previousBackStackEntry != null,
                 currentScreen = currentScreen,
+                canNavigateUp = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
                 navigatePremium = { navController.navigate(StatsAppScreen.Premium.name) },
                 navigateSettings = { navController.navigate(StatsAppScreen.Settings.name) },
@@ -126,7 +125,7 @@ fun StatsAppPreview(
     Scaffold(
         topBar = {
             TopBar(
-                canNavigateBack = navController.previousBackStackEntry != null,
+                canNavigateUp = navController.previousBackStackEntry != null,
                 currentScreen = currentScreen,
                 navigateUp = { navController.navigateUp() },
                 navigatePremium = { navController.navigate(StatsAppScreen.Premium.name) },
