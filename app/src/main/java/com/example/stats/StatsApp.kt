@@ -52,6 +52,7 @@ fun StatsApp(
         },
         bottomBar = {
             BottomBar(
+                currentScreen = currentScreen,
                 navigateBattery = {
                     navController.navigate(StatsAppScreen.Battery.name) {
                         launchSingleTop = true
@@ -136,6 +137,7 @@ fun StatsAppPreview(
         },
         bottomBar = {
             BottomBar(
+                currentScreen = currentScreen,
                 navigateBattery = { navController.navigate(StatsAppScreen.Battery.name) },
                 navigateNetwork = { navController.navigate(StatsAppScreen.Network.name) },
                 navigateDashboard = { navController.navigate(StatsAppScreen.Dashboard.name) }
