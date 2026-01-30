@@ -1,9 +1,9 @@
-package com.example.stats.ui.topbar.pages
+package com.example.stats.ui.pages
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun Licenses() {
-    Text("Licenses Page")
+fun Premium() {
+    Text("Premium Page")
 }

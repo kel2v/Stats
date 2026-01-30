@@ -13,14 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.stats.ui.bottombar.BottomBar
-import com.example.stats.ui.bottombar.pages.Battery
-import com.example.stats.ui.bottombar.pages.Dashboard
-import com.example.stats.ui.bottombar.pages.Network
+import com.example.stats.ui.pages.Battery
+import com.example.stats.ui.pages.Dashboard
+import com.example.stats.ui.pages.Network
 import com.example.stats.ui.topbar.TopBar
-import com.example.stats.ui.topbar.pages.Licenses
-import com.example.stats.ui.topbar.pages.Premium
-import com.example.stats.ui.topbar.pages.PrivacyPolicy
-import com.example.stats.ui.topbar.pages.Settings
+import com.example.stats.ui.pages.Licenses
+import com.example.stats.ui.pages.Premium
+import com.example.stats.ui.pages.PrivacyPolicy
+import com.example.stats.ui.pages.Settings
 
 enum class StatsAppScreen(@StringRes val title: Int) {
     Dashboard(title = R.string.dashboard_page_title),

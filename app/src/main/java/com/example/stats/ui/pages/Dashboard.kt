@@ -1,9 +1,9 @@
-package com.example.stats.ui.topbar.pages
+package com.example.stats.ui.pages
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun Settings() {
-    Text("Settings Page")
+fun Dashboard() {
+    Text("Dashboard Page")
 }

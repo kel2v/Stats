@@ -1,4 +1,4 @@
-package com.example.stats.ui.bottombar.pages
+package com.example.stats.ui.pages
 
 import android.content.BroadcastReceiver
 import android.content.Context
