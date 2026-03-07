@@ -24,11 +24,13 @@ import kotlinx.coroutines.launch
 object CurrentNowRepository {
     private lateinit var appContext: Context
 
+    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     fun init(context: Context) {
         appContext = context.applicationContext
     }
 
-    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
 
     val currentNowStateFlow by lazy {
 
