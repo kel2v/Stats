@@ -11,50 +11,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-object CurrentNowRepository {
-    private lateinit var appContext: Context
-
-    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    fun init(context: Context) {
-        appContext = context.applicationContext
-    }
-
-
-
-    val currentNowStateFlow by lazy {
-
-        flow {
-            val batteryManager =
-                appContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-
-            while (true) {
-                emit(
-                    batteryManager
-                        .getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / 1000
-                )
-                delay(1_000)
-            }
-        }
-        .flowOn(Dispatchers.IO)
-        .distinctUntilChanged()
-        .stateIn(
-            scope = appScope,
-            started = SharingStarted.WhileSubscribed(1_000),
-            initialValue = 0
-        )
-    }
-}
 
 object BatteryStateRepository {
     private lateinit var appContext: Context
@@ -111,8 +72,6 @@ object BatteryStateRepository {
 }
 
 class BatteryViewModel() : ViewModel() {
-
-    val currentNowStateFlow: StateFlow<Int> = CurrentNowRepository.currentNowStateFlow
     val batteryStateStateFlow: StateFlow<BatteryState> = BatteryStateRepository.batteryStateStateFlow
 }
 

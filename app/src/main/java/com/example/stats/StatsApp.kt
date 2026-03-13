@@ -12,10 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.stats.ui.bottombar.BottomBar
 import com.example.stats.ui.pages.Battery
-import com.example.stats.ui.pages.Dashboard
-import com.example.stats.ui.pages.Network
 import com.example.stats.ui.topbar.TopBar
 import com.example.stats.ui.pages.Licenses
 import com.example.stats.ui.pages.Premium
@@ -23,9 +20,7 @@ import com.example.stats.ui.pages.PrivacyPolicy
 import com.example.stats.ui.pages.Settings
 
 enum class StatsAppScreen(@StringRes val title: Int) {
-    Dashboard(title = R.string.dashboard_page_title),
     Battery(title = R.string.battery_page_title),
-    Network(title = R.string.network_page_title),
     Premium(title = R.string.premium_page_title),
     Settings(title = R.string.settings_page_title),
     PrivacyPolicy(title = R.string.privacy_policy_page_title),
@@ -36,7 +31,7 @@ fun StatsApp(
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = StatsAppScreen.valueOf(backStackEntry?.destination?.route ?: StatsAppScreen.Dashboard.name)
+    val currentScreen = StatsAppScreen.valueOf(backStackEntry?.destination?.route ?: StatsAppScreen.Battery.name)
 
     Scaffold(
         topBar = {
@@ -50,49 +45,17 @@ fun StatsApp(
                 navigateLicenses = { navController.navigate(StatsAppScreen.Licenses.name) }
             )
         },
-        bottomBar = {
-            BottomBar(
-                currentScreen = currentScreen,
-                navigateBattery = {
-                    navController.navigate(StatsAppScreen.Battery.name) {
-                        launchSingleTop = true
-                        popUpTo(0)
-                        restoreState = true
-                    }
-                },
-                navigateNetwork = {
-                    navController.navigate(StatsAppScreen.Network.name) {
-                        launchSingleTop = true
-                        popUpTo(0)
-                        restoreState = true
-                    }
-                },
-                navigateDashboard = {
-                    navController.navigate(StatsAppScreen.Dashboard.name) {
-                        launchSingleTop = true
-                        popUpTo(0)
-                        restoreState = true
-                    }
-                }
-            )
-        }
+        bottomBar = { }
     ) { innerPadding ->
 
         NavHost(
             navController = navController,
-            startDestination = StatsAppScreen.Dashboard.name,
+            startDestination = StatsAppScreen.Battery.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = StatsAppScreen.Dashboard.name) {
-                Dashboard()
-            }
 
             composable(route = StatsAppScreen.Battery.name) {
                 Battery()
-            }
-
-            composable(route = StatsAppScreen.Network.name) {
-                Network()
             }
 
             composable(route = StatsAppScreen.Premium.name) {
@@ -121,7 +84,7 @@ fun StatsAppPreview(
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = StatsAppScreen.valueOf(backStackEntry?.destination?.route ?: StatsAppScreen.Dashboard.name)
+    val currentScreen = StatsAppScreen.valueOf(backStackEntry?.destination?.route ?: StatsAppScreen.Battery.name)
 
     Scaffold(
         topBar = {
@@ -136,30 +99,17 @@ fun StatsAppPreview(
             )
         },
         bottomBar = {
-            BottomBar(
-                currentScreen = currentScreen,
-                navigateBattery = { navController.navigate(StatsAppScreen.Battery.name) },
-                navigateNetwork = { navController.navigate(StatsAppScreen.Network.name) },
-                navigateDashboard = { navController.navigate(StatsAppScreen.Dashboard.name) }
-            )
         }
     ) { innerPadding ->
 
         NavHost(
             navController = navController,
-            startDestination = StatsAppScreen.Dashboard.name,
+            startDestination = StatsAppScreen.Battery.name,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = StatsAppScreen.Dashboard.name) {
-                Dashboard()
-            }
 
             composable(route = StatsAppScreen.Battery.name) {
                 Battery()
-            }
-
-            composable(route = StatsAppScreen.Network.name) {
-                Network()
             }
 
             composable(route = StatsAppScreen.Premium.name) {
