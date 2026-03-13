@@ -60,6 +60,7 @@ object StatsNotificationManager {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
+            .setSilent(true)
             .build()
 
         with(NotificationManagerCompat.from(context)) {
