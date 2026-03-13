@@ -6,16 +6,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
+import com.example.stats.notification.showLocalNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 object BatteryStateRepository {
     private lateinit var appContext: Context
@@ -51,6 +50,8 @@ object BatteryStateRepository {
                     )
 
                     trySend(state)
+
+                    showLocalNotification(appContext, state)
                 }
             }
 
