@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import com.example.stats.notification.showLocalNotification
+import com.example.stats.ui.pages.BatteryStateRepository.appScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,7 +28,7 @@ object BatteryStateRepository {
 
     // This ia a Flow object that emits BatteryState whenever new Intent indicating Intent.ACTION_BATTERY_CHANGED is broadcasted.
     // It is defined lazy, means it is initialized on its first access.
-    val batteryStateStateFlow by lazy {
+    val batteryStateFlow by lazy {
 
         // callbackFlow creates a Flow object that reacts to new events it is concerned with by emitting a value.
         // Here, on receiving a broadcast for Intent.ACTION_BATTERY_CHANGED, it emits a BatteryState object with new values initialized as provided by the broadcast.
@@ -61,7 +62,11 @@ object BatteryStateRepository {
                 appContext.unregisterReceiver(receiver)
             }
 
-        }.stateIn(
+        }
+    }
+
+    val batteryStateStateFlow by lazy {
+        batteryStateFlow.stateIn(
             scope = appScope,
             started = SharingStarted.WhileSubscribed(1000),
             initialValue = BatteryState(
@@ -76,7 +81,7 @@ object BatteryStateRepository {
     }
 }
 
-class BatteryViewModel() : ViewModel() {
+class BatteryViewModel : ViewModel() {
     val batteryStateStateFlow: StateFlow<BatteryState> = BatteryStateRepository.batteryStateStateFlow
 }
 
