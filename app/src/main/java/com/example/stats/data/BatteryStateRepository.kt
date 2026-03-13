@@ -1,18 +1,15 @@
-package com.example.stats.ui.pages
+package com.example.stats.data
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
-import androidx.lifecycle.ViewModel
-import com.example.stats.notification.showLocalNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 
@@ -50,8 +47,6 @@ object BatteryStateRepository {
                     )
 
                     trySend(state)
-
-                    showLocalNotification(appContext, state)
                 }
             }
 
@@ -79,16 +74,3 @@ object BatteryStateRepository {
         )
     }
 }
-
-class BatteryViewModel : ViewModel() {
-    val batteryStateStateFlow: StateFlow<BatteryState> = BatteryStateRepository.batteryStateStateFlow
-}
-
-data class BatteryState(
-    val level: Int,
-    val voltage: Int,
-    val chargingStatus: Int,
-    val temperature: Int,
-    val technology: String?,
-    val health: Int
-)
