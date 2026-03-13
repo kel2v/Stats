@@ -28,38 +28,3 @@ fun ListItem(
         )
     }
 }
-
-
-//@Composable
-//@Preview(showBackground = true)
-//fun ListPreview() {
-//    Column(modifier = Modifier.fillMaxWidth()) {
-//        ListItem(
-//            parameterName = "Name",
-//            parameterNameModifier = Modifier,
-//            parameterValue = "Carlos Sainz",
-//            parameterValueModifier = Modifier
-//        )
-//
-//        ListItem(
-//            parameterName = "Name",
-//            parameterNameModifier = Modifier,
-//            parameterValue = "Alex Albon",
-//            parameterValueModifier = Modifier
-//        )
-//
-//        ListItem(
-//            parameterName = "Name",
-//            parameterNameModifier = Modifier,
-//            parameterValue = "Max Verstappen",
-//            parameterValueModifier = Modifier
-//        )
-//
-//        ListItem(
-//            parameterName = "Name",
-//            parameterNameModifier = Modifier,
-//            parameterValue = "Charles Leclerc",
-//            parameterValueModifier = Modifier
-//        )
-//    }
-//}
