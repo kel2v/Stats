@@ -26,12 +26,22 @@ object BatteryStateRepository {
 
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    // This ia a Flow object that emits BatteryState whenever new Intent indicating Intent.ACTION_BATTERY_CHANGED is broadcasted.
+    // It is defined lazy, means it is initialized on its first access.
     val batteryStateStateFlow by lazy {
+
+        // callbackFlow creates a Flow object that reacts to new events it is concerned with by emitting a value.
+        // Here, on receiving a broadcast for Intent.ACTION_BATTERY_CHANGED, it emits a BatteryState object with new values initialized as provided by the broadcast.
         callbackFlow {
+
+            // creates an object of type BroadcastReceiver that also overrides `onReceive` method, which is called by Android when any Intent of Intent.ACTION_BATTERY_CHANGED type occurs
             val receiver = object : BroadcastReceiver() {
+
+                // It is called by the Android whenever an Intent of Intent.ACTION_BATTERY_CHANGED type occurs
                 override fun onReceive(context: Context?, intent: Intent?) {
                     if(intent == null) return
 
+                    // performs the operation of extracting values for state and emitting it as a coroutine task
                     appScope.launch {
                         val state = BatteryState(
                             level = (intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100) / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1),
@@ -44,15 +54,16 @@ object BatteryStateRepository {
 
                         trySend(state)
                     }
-
-
                 }
             }
 
             appContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
             awaitClose {
+
+                // cancels any pending task of "initializing `state` and emitting it" coroutine.
                 appScope.cancel()
+
                 appContext.unregisterReceiver(receiver)
             }
 
