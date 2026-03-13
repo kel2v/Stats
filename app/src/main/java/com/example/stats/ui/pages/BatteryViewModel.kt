@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import com.example.stats.notification.showLocalNotification
-import com.example.stats.ui.pages.BatteryStateRepository.appScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

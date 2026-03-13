@@ -13,11 +13,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.stats.ui.pages.Battery
-import com.example.stats.ui.topbar.TopBar
 import com.example.stats.ui.pages.Licenses
 import com.example.stats.ui.pages.Premium
 import com.example.stats.ui.pages.PrivacyPolicy
 import com.example.stats.ui.pages.Settings
+import com.example.stats.ui.topbar.TopBar
 
 enum class StatsAppScreen(@StringRes val title: Int) {
     Battery(title = R.string.battery_page_title),
