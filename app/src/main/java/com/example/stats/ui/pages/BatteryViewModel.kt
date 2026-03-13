@@ -41,29 +41,22 @@ object BatteryStateRepository {
                 override fun onReceive(context: Context?, intent: Intent?) {
                     if(intent == null) return
 
-                    // performs the operation of extracting values for state and emitting it as a coroutine task
-                    appScope.launch {
-                        val state = BatteryState(
-                            level = (intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100) / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1),
-                            chargingStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
-                            temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1),
-                            voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1),
-                            technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
-                            health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
-                        )
+                    val state = BatteryState(
+                        level = (intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100) / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1),
+                        chargingStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
+                        temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1),
+                        voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1),
+                        technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
+                        health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
+                    )
 
-                        trySend(state)
-                    }
+                    trySend(state)
                 }
             }
 
             appContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
             awaitClose {
-
-                // cancels any pending task of "initializing `state` and emitting it" coroutine.
-                appScope.cancel()
-
                 appContext.unregisterReceiver(receiver)
             }
 
