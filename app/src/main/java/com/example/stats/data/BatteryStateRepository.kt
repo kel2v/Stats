@@ -20,8 +20,6 @@ object BatteryStateRepository {
         appContext = context.applicationContext
     }
 
-    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
     // This ia a Flow object that emits BatteryState whenever new Intent indicating Intent.ACTION_BATTERY_CHANGED is broadcasted.
     // It is defined lazy, means it is initialized on its first access.
     val batteryStateFlow by lazy {
@@ -39,11 +37,25 @@ object BatteryStateRepository {
 
                     val state = BatteryState(
                         level = (intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100) / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1),
-                        chargingStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1),
-                        temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1),
-                        voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1),
+                        temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) / 10f,
+                        voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)/1000f,
                         technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
-                        health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
+                        chargingStatus = when (intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)) {
+                            BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
+                            BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
+                            BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
+                            BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
+                            BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Overvoltage"
+                            BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Unspecified failure"
+                            else -> "Unknown"
+                        },
+                        health = when(intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)) {
+                            BatteryManager.BATTERY_STATUS_FULL -> "Full"
+                            BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
+                            BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
+                            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not charging"
+                            else -> "Unknown"
+                        }
                     )
 
                     trySend(state)
@@ -61,15 +73,15 @@ object BatteryStateRepository {
 
     val batteryStateStateFlow by lazy {
         batteryStateFlow.stateIn(
-            scope = appScope,
-            started = SharingStarted.WhileSubscribed(1000),
+            scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = BatteryState(
                 level = Int.MIN_VALUE,
-                voltage = Int.MIN_VALUE,
-                chargingStatus = Int.MIN_VALUE,
-                temperature = Int.MIN_VALUE,
+                voltage = Float.MIN_VALUE,
+                chargingStatus = "NA",
+                temperature = Float.MIN_VALUE,
                 technology = null,
-                health = Int.MIN_VALUE
+                health = "NA"
             )
         )
     }

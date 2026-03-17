@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -29,10 +30,10 @@ object StatsNotificationManager {
 
     fun init(context: Context) {
         appContext = context.applicationContext
-        createStatsNotificationChannel(appContext)
+        createStatsNotificationChannel()
     }
 
-    private fun createStatsNotificationChannel(context: Context) {
+    private fun createStatsNotificationChannel() {
         Log.d("PERMISSION DIALOG", "Creating notification channel")
 
         val channelId = "Stats"
@@ -44,15 +45,16 @@ object StatsNotificationManager {
             description = channelDescription
         }
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 
     fun startStatsNotificationBroadcast() {
         Log.d("PERMISSION DIALOG", "Starting notification broadcast")
         callbackCoroutine = scope.launch {
-            BatteryStateRepository.batteryStateFlow.collect { state ->
-                showStatsLocalNotification(state)
+            while(true) {
+                showStatsLocalNotification(BatteryStateRepository.batteryStateStateFlow.value)
+                delay(1000)
             }
         }
     }
@@ -73,8 +75,8 @@ object StatsNotificationManager {
 
         val notification = NotificationCompat.Builder(appContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("temp: ${batteryState.temperature/10f} Celsius | level = ${batteryState.level}%")
-            .setContentText("voltage: ${batteryState.voltage/1000f} V")
+            .setContentTitle("temp: ${batteryState.temperature} Celsius | level = ${batteryState.level}%")
+            .setContentText("voltage: ${batteryState.voltage} V")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
@@ -84,7 +86,7 @@ object StatsNotificationManager {
         with(NotificationManagerCompat.from(appContext)) {
             if(ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 notify(1001, notification)
-                Log.d("PERMISSION DIALOG", "temp: ${batteryState.temperature/10f} Celsius | level = ${batteryState.level}%\nvoltage: ${batteryState.voltage/1000f} V")
+                Log.d("PERMISSION DIALOG", "temp: ${batteryState.temperature} Celsius | level = ${batteryState.level}%\nvoltage: ${batteryState.voltage} V")
             } else {
                 Log.d("PERMISSION DIALOG", "Unable to post notification. No permission to post")
             }

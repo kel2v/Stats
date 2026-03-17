@@ -2,9 +2,9 @@ package com.example.stats.data
 
 data class BatteryState(
     val level: Int,
-    val voltage: Int,
-    val chargingStatus: Int,
-    val temperature: Int,
+    val voltage: Float,
+    val chargingStatus: String,
+    val temperature: Float,
     val technology: String?,
-    val health: Int
+    val health: String
 )
