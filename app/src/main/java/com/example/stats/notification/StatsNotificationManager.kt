@@ -7,9 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -23,10 +21,20 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-object StatsNotificationManager {
-    lateinit var appContext: Context
 
-    fun createNotificationChannel(context: Context) {
+object StatsNotificationManager {
+    private lateinit var appContext: Context
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private lateinit var callbackCoroutine: Job
+
+    fun init(context: Context) {
+        appContext = context.applicationContext
+        createStatsNotificationChannel(appContext)
+    }
+
+    private fun createStatsNotificationChannel(context: Context) {
+        Log.d("PERMISSION DIALOG", "Creating notification channel")
+
         val channelId = "Stats"
         val channelName = "Battery info"
         val channelDescription = "battery parameters updates"
@@ -36,24 +44,34 @@ object StatsNotificationManager {
             description = channelDescription
         }
 
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun showLocalNotification(context: Context, batteryState: BatteryState) {
+    fun startStatsNotificationBroadcast() {
+        Log.d("PERMISSION DIALOG", "Starting notification broadcast")
+        callbackCoroutine = scope.launch {
+            BatteryStateRepository.batteryStateFlow.collect { state ->
+                showStatsLocalNotification(state)
+            }
+        }
+    }
+
+    private fun showStatsLocalNotification(batteryState: BatteryState) {
+        Log.d("PERMISSION DIALOG", "posting new notification ...")
+
         val channelId = "Stats"
 
         // Optional: tap notification to open MainActivity
-        val intent = Intent(context, MainActivity::class.java)
+        val intent = Intent(appContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
-            context,
+            appContext,
             0,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, channelId)
+        val notification = NotificationCompat.Builder(appContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("temp: ${batteryState.temperature/10f} Celsius | level = ${batteryState.level}%")
             .setContentText("voltage: ${batteryState.voltage/1000f} V")
@@ -63,55 +81,18 @@ object StatsNotificationManager {
             .setSilent(true)
             .build()
 
-        with(NotificationManagerCompat.from(context)) {
-            if(ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+        with(NotificationManagerCompat.from(appContext)) {
+            if(ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 notify(1001, notification)
-                Log.d("NOTIFICATION", "temp: ${batteryState.temperature/10f} Celsius | level = ${batteryState.level}%\nvoltage: ${batteryState.voltage/1000f} V")
-            }
-        }
-    }
-
-    fun init(context: Context, requestNotificationPermissionLauncher: ActivityResultLauncher<String>) {
-        appContext = context.applicationContext
-
-        createNotificationChannel(appContext)
-
-        Log.d("PERMISSION DIALOG", "checking notification permission")
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                Log.d("PERMISSION DIALOG", "device is newer, Permission already granted")
-                startNotificationBroadcast()
+                Log.d("PERMISSION DIALOG", "temp: ${batteryState.temperature/10f} Celsius | level = ${batteryState.level}%\nvoltage: ${batteryState.voltage/1000f} V")
             } else {
-                Log.d("PERMISSION DIALOG", "device is newer, Permission not yet granted")
-                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-
-                if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("PERMISSION DIALOG", "device is newer, Permission now granted")
-                    startNotificationBroadcast()
-                } else {
-                    Log.d("PERMISSION DIALOG", "device is newer, Permission denied")
-                }
-            }
-        } else {
-            Log.d("PERMISSION DIALOG", "Old device, no permission needed")
-            startNotificationBroadcast()
-        }
-    }
-
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    lateinit var callbackCoroutine: Job
-
-    fun startNotificationBroadcast() {
-        callbackCoroutine = scope.launch {
-            BatteryStateRepository.batteryStateFlow.collect { state ->
-                showLocalNotification(appContext, state)
+                Log.d("PERMISSION DIALOG", "Unable to post notification. No permission to post")
             }
         }
     }
 
-    fun destroyNotificationBroadcast() {
+    fun destroyStatsNotificationBroadcast() {
+        Log.d("PERMISSION DIALOG", "Destroying notification broadcast")
         callbackCoroutine.cancel()
     }
 }
