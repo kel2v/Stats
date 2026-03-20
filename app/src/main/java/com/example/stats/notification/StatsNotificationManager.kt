@@ -1,16 +1,12 @@
 package com.example.stats.notification
 
-import android.Manifest
-import android.app.NotificationChannel
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import com.example.stats.MainActivity
 import com.example.stats.R
 import com.example.stats.data.BatteryState
@@ -28,25 +24,22 @@ object StatsNotificationManager {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private lateinit var callbackCoroutine: Job
 
+    private lateinit var channel: StatsNotificationChannel
+
     fun init(context: Context) {
         appContext = context.applicationContext
-        createStatsNotificationChannel()
     }
 
-    private fun createStatsNotificationChannel() {
+    fun createStatsNotificationChannel() {
         Log.d("PERMISSION DIALOG", "Creating notification channel")
 
-        val channelId = "Stats"
-        val channelName = "Battery info"
-        val channelDescription = "battery parameters updates"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-
-        val channel = NotificationChannel(channelId, channelName, importance).apply {
-            description = channelDescription
-        }
-
-        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+        channel = StatsNotificationChannel(
+            channelId = "Stats",
+            channelName = "Battery info",
+            importance = NotificationManager.IMPORTANCE_DEFAULT,
+            channelDescription = "battery temperature, battery level and battery voltage"
+        )
+        channel.createChannel()
     }
 
     fun startStatsNotificationBroadcast() {
@@ -59,12 +52,8 @@ object StatsNotificationManager {
         }
     }
 
-    private fun showStatsLocalNotification(batteryState: BatteryState) {
-        Log.d("PERMISSION DIALOG", "posting new notification ...")
-
+    fun buildStatsNotification(): Notification {
         val channelId = "Stats"
-
-        // Optional: tap notification to open MainActivity
         val intent = Intent(appContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             appContext,
@@ -75,22 +64,22 @@ object StatsNotificationManager {
 
         val notification = NotificationCompat.Builder(appContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("temp: ${batteryState.temperature} Celsius | level = ${batteryState.level}%")
-            .setContentText("voltage: ${batteryState.voltage} V")
+            .setContentTitle("temp: ${BatteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${BatteryStateRepository.batteryStateStateFlow.value.level}%")
+            .setContentText("voltage: ${BatteryStateRepository.batteryStateStateFlow.value.voltage} V")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setSilent(true)
             .build()
 
-        with(NotificationManagerCompat.from(appContext)) {
-            if(ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                notify(1001, notification)
-                Log.d("PERMISSION DIALOG", "temp: ${batteryState.temperature} Celsius | level = ${batteryState.level}%\nvoltage: ${batteryState.voltage} V")
-            } else {
-                Log.d("PERMISSION DIALOG", "Unable to post notification. No permission to post")
-            }
-        }
+        return notification
+    }
+
+    private fun showStatsLocalNotification(batteryState: BatteryState) {
+        Log.d("PERMISSION DIALOG", "posting new notification ...")
+
+        val notification = buildStatsNotification()
+        channel.postNotification(notification, 1001)
     }
 
     fun destroyStatsNotificationBroadcast() {
