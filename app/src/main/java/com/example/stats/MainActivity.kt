@@ -10,7 +10,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import com.example.stats.data.BatteryStateRepository
 import com.example.stats.notification.StatsNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -26,8 +25,6 @@ class MainActivity : ComponentActivity() {
         Log.d("PERMISSION DIALOG", "running onCreate")
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        BatteryStateRepository.init(this.applicationContext)
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestNotificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

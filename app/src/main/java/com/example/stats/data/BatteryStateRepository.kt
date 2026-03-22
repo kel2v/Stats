@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,13 +13,11 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object BatteryStateRepository {
-    private lateinit var appContext: Context
-
-    fun init(context: Context) {
-        appContext = context.applicationContext
-    }
+@Singleton
+class BatteryStateRepository @Inject constructor(@ApplicationContext private val appContext: Context) {
 
     // This ia a Flow object that emits BatteryState whenever new Intent indicating Intent.ACTION_BATTERY_CHANGED is broadcasted.
     // It is defined lazy, means it is initialized on its first access.
@@ -40,20 +39,23 @@ object BatteryStateRepository {
                         temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) / 10f,
                         voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)/1000f,
                         technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
-                        chargingStatus = when (intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)) {
+
+                        health = when (intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)) {
                             BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
                             BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
                             BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
                             BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
                             BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Overvoltage"
                             BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Unspecified failure"
+                            BatteryManager.BATTERY_HEALTH_UNKNOWN -> "Unknown"
                             else -> "Unknown"
                         },
-                        health = when(intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)) {
+                        chargingStatus = when(intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)) {
                             BatteryManager.BATTERY_STATUS_FULL -> "Full"
                             BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
                             BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
                             BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not charging"
+                            BatteryManager.BATTERY_STATUS_UNKNOWN -> "Unknown"
                             else -> "Unknown"
                         }
                     )

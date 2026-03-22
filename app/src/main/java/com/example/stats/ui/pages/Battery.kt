@@ -4,12 +4,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.example.stats.models.BatteryViewModel
 import com.example.stats.ui.listitem.ListItem
 
 @Composable
-fun Battery(batteryViewModel: BatteryViewModel = viewModel()) {
+fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(LocalViewModelStoreOwner.current) {
+            "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+        })
+) {
     val batteryState by batteryViewModel.batteryStateStateFlow.collectAsState()
 
     Column {

@@ -20,7 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context) {
+class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context, private val batteryStateRepository: BatteryStateRepository) {
     private lateinit var callbackCoroutine: Job
     @Inject
     lateinit var channel: StatsNotificationChannel
@@ -41,7 +41,7 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
         Log.d("PERMISSION DIALOG", "Starting notification broadcast")
         callbackCoroutine = CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             while(true) {
-                showStatsLocalNotification(BatteryStateRepository.batteryStateStateFlow.value)
+                showStatsLocalNotification(batteryStateRepository.batteryStateStateFlow.value)
                 delay(1000)
             }
         }
@@ -59,8 +59,8 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
 
         val notification = NotificationCompat.Builder(appContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("temp: ${BatteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${BatteryStateRepository.batteryStateStateFlow.value.level}%")
-            .setContentText("voltage: ${BatteryStateRepository.batteryStateStateFlow.value.voltage} V")
+            .setContentTitle("temp: ${batteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${batteryStateRepository.batteryStateStateFlow.value.level}%")
+            .setContentText("voltage: ${batteryStateRepository.batteryStateStateFlow.value.voltage} V")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
