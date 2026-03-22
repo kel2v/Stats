@@ -52,7 +52,6 @@ class MainActivity : ComponentActivity() {
         Log.d("PERMISSION DIALOG", "exiting onCreate")
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onResume() {
         Log.d("PERMISSION DIALOG", "running onResume")
         super.onResume()
