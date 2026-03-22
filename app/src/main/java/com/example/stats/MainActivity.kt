@@ -12,33 +12,42 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import com.example.stats.data.BatteryStateRepository
 import com.example.stats.notification.StatsNotificationManager
-import com.example.stats.notification.StatsNotificationManager.startStatsNotificationBroadcast
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
+    @Inject
+    lateinit var statsNotificationManager: StatsNotificationManager
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("PERMISSION DIALOG", "running onCreate")
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         BatteryStateRepository.init(this.applicationContext)
-        StatsNotificationManager.init(this.applicationContext)
 
-        requestNotificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            Log.d("PERMISSION DIALOG", "User responded for permission request")
-            if (isGranted) {
-                Log.d("PERMISSION DIALOG", "Permission granted")
-                startStatsNotificationBroadcast()
-            } else {
-                Log.d("PERMISSION DIALOG", "Permission NOT granted")
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestNotificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                Log.d("PERMISSION DIALOG", "User responded for permission request")
+                if (isGranted) {
+                    Log.d("PERMISSION DIALOG", "Permission granted")
+                    statsNotificationManager.createStatsNotificationChannel()
+                    statsNotificationManager.startStatsNotificationBroadcast()
+                } else {
+                    Log.d("PERMISSION DIALOG", "Permission NOT granted")
+                }
             }
+
+            requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            Log.d("PERMISSION DIALOG", "Old API, no permission request needed")
+            statsNotificationManager.createStatsNotificationChannel()
+            statsNotificationManager.startStatsNotificationBroadcast()
         }
 
-        requestNotificationPermissionLauncher.launch(
-            Manifest.permission.POST_NOTIFICATIONS
-        )
 
         setContent {
             StatsApp()
@@ -70,6 +79,6 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d("PERMISSION DIALOG", "running onDestroy")
-        StatsNotificationManager.destroyStatsNotificationBroadcast()
+        statsNotificationManager.destroyStatsNotificationBroadcast()
     }
 }

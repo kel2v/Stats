@@ -11,40 +11,35 @@ import com.example.stats.MainActivity
 import com.example.stats.R
 import com.example.stats.data.BatteryState
 import com.example.stats.data.BatteryStateRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-object StatsNotificationManager {
-    private lateinit var appContext: Context
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context) {
     private lateinit var callbackCoroutine: Job
-
-    private lateinit var channel: StatsNotificationChannel
-
-    fun init(context: Context) {
-        appContext = context.applicationContext
-    }
+    @Inject
+    lateinit var channel: StatsNotificationChannel
 
     fun createStatsNotificationChannel() {
         Log.d("PERMISSION DIALOG", "Creating notification channel")
 
-        channel = StatsNotificationChannel(
-            channelId = "Stats",
-            channelName = "Battery info",
-            importance = NotificationManager.IMPORTANCE_DEFAULT,
-            channelDescription = "battery temperature, battery level and battery voltage"
+        channel.init(
+            _channelId = "Stats",
+            _channelName = "Battery info",
+            _importance = NotificationManager.IMPORTANCE_DEFAULT,
+            _channelDescription = "battery temperature, battery level and battery voltage"
         )
         channel.createChannel()
     }
 
     fun startStatsNotificationBroadcast() {
         Log.d("PERMISSION DIALOG", "Starting notification broadcast")
-        callbackCoroutine = scope.launch {
+        callbackCoroutine = CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             while(true) {
                 showStatsLocalNotification(BatteryStateRepository.batteryStateStateFlow.value)
                 delay(1000)
