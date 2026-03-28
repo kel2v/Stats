@@ -30,75 +30,8 @@ class StatsNotificationService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("PERMISSION DIALOG", "Running onStartCommand")
 
-//        val channel = NotificationChannel("Stats", "Battery info", NotificationManager.IMPORTANCE_DEFAULT).apply {
-//            description = "battery temperature, battery level and battery voltage"
-//        }
-//
-//        val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//        notificationManager.createNotificationChannel(channel)
-//
-//        val intent = Intent(appContext, MainActivity::class.java)
-//        val pendingIntent = PendingIntent.getActivity(
-//            appContext,
-//            0,
-//            intent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//
-//        var temp = batteryStateRepository.batteryStateStateFlow.value.temperature
-//        var level = batteryStateRepository.batteryStateStateFlow.value.level
-//        var voltage = batteryStateRepository.batteryStateStateFlow.value.voltage
-//        var notification = NotificationCompat.Builder(applicationContext, "Stats")
-//            .setSmallIcon(R.drawable.ic_launcher_foreground)
-//            .setContentTitle("temp: $temp Celsius | level = $level%")
-//            .setContentText("voltage: $voltage V")
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .setContentIntent(pendingIntent)
-//            .setOngoing(true)
-//            .setSilent(true)
-//            .build()
-//
-//        startForeground(1, notification)
-//
-//        scope.launch {
-//            batteryStateRepository.batteryStateFlow.collect {state ->
-//                Log.d("PERMISSION DIALOG", "Collected new batteryState")
-//                temp = state.temperature
-//                level = state.level
-//                voltage = state.voltage
-//
-//                Log.d("PERMISSION DIALOG", "temp = $temp, level = $level, voltage = $voltage")
-//
-//                notification = NotificationCompat.Builder(appContext, "Stats")
-//                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-//                    .setContentTitle("temp: $temp Celsius | level = $level%")
-//                    .setContentText("voltage: $voltage V")
-//                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                    .setContentIntent(pendingIntent)
-//                    .setOngoing(true)
-//                    .setSilent(true)
-//                    .build()
-//
-//                notificationManager.notify(1, notification)
-//            }
-//            while(isActive) {
-//                notificationManager.notify(1, statsNotificationManager.buildStatsNotification())
-//                delay(1000)
-//            }
-//        }
-
         statsNotificationManager.createStatsNotificationChannel()
         startForeground(1, statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value))
-
-//        scope.launch {
-//            val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//            while(isActive) {
-//                val notification = statsNotificationManager.buildStatsNotification()
-//                notificationManager.notify(1, notification)
-//                Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
-//                delay(1000)
-//            }
-//        }
 
         scope.launch {
             batteryStateRepository.batteryStateFlow.collect { batteryState ->
