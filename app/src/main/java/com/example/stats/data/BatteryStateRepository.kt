@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,7 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
         // callbackFlow creates a Flow object that reacts to new events it is concerned with by emitting a value.
         // Here, on receiving a broadcast for Intent.ACTION_BATTERY_CHANGED, it emits a BatteryState object with new values initialized as provided by the broadcast.
         callbackFlow {
+            Log.d("PERMISSION DIALOG", "callbackFlow is started executing")
 
             // creates an object of type BroadcastReceiver that also overrides `onReceive` method, which is called by Android when any Intent of Intent.ACTION_BATTERY_CHANGED type occurs
             val receiver = object : BroadcastReceiver() {
@@ -73,18 +75,16 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
         }
     }
 
-    val batteryStateStateFlow by lazy {
-        batteryStateFlow.stateIn(
-            scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = BatteryState(
-                level = Int.MIN_VALUE,
-                voltage = Float.MIN_VALUE,
-                chargingStatus = "NA",
-                temperature = Float.MIN_VALUE,
-                technology = null,
-                health = "NA"
-            )
+    val batteryStateStateFlow = batteryStateFlow.stateIn(
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+        started = SharingStarted.Eagerly,
+        initialValue = BatteryState(
+            level = Int.MIN_VALUE,
+            voltage = Float.MIN_VALUE,
+            chargingStatus = "NA",
+            temperature = Float.MIN_VALUE,
+            technology = null,
+            health = "NA"
         )
-    }
+    )
 }

@@ -15,6 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,11 +36,19 @@ class StatsNotificationService: Service() {
         startForeground(1, statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value))
 
         scope.launch {
-            batteryStateRepository.batteryStateFlow.collect { batteryState ->
+//            batteryStateRepository.batteryStateFlow.collect { batteryState ->
+//                val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//                val notification = statsNotificationManager.buildStatsNotification(batteryState)
+//                notificationManager.notify(1, notification)
+//                Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
+//            }
+
+            while(isActive) {
                 val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                val notification = statsNotificationManager.buildStatsNotification(batteryState)
+                val notification = statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
                 notificationManager.notify(1, notification)
                 Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
+                delay(1000)
             }
         }
 

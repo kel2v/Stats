@@ -20,9 +20,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context, batteryStateRepository: BatteryStateRepository, private val channel: StatsNotificationChannel) {
+class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context, private val batteryStateRepository: BatteryStateRepository, private val channel: StatsNotificationChannel) {
     private lateinit var callbackCoroutine: Job
-    private val batteryStateStateFlow = batteryStateRepository.batteryStateStateFlow
 
     fun createStatsNotificationChannel() {
         Log.d("PERMISSION DIALOG", "Creating notification channel")
@@ -72,7 +71,7 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
     private fun showStatsLocalNotification() {
         Log.d("PERMISSION DIALOG", "posting new notification ...")
 
-        val notification = buildStatsNotification(batteryStateStateFlow.value)
+        val notification = buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
         channel.postNotification(notification, 1001)
     }
 
