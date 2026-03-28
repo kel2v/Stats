@@ -1,6 +1,7 @@
 package com.example.stats
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,17 +10,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import com.example.stats.notification.StatsNotificationManager
+import androidx.core.content.ContextCompat
+import com.example.stats.services.StatsNotificationService
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity: ComponentActivity() {
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
-    @Inject
-    lateinit var statsNotificationManager: StatsNotificationManager
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("PERMISSION DIALOG", "running onCreate")
@@ -31,18 +28,17 @@ class MainActivity : ComponentActivity() {
                 Log.d("PERMISSION DIALOG", "User responded for permission request")
                 if (isGranted) {
                     Log.d("PERMISSION DIALOG", "Permission granted")
-                    statsNotificationManager.createStatsNotificationChannel()
-                    statsNotificationManager.startStatsNotificationBroadcast()
+                    val intent = Intent(this, StatsNotificationService::class.java)
+                    ContextCompat.startForegroundService(this, intent)
                 } else {
                     Log.d("PERMISSION DIALOG", "Permission NOT granted")
                 }
             }
-
             requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             Log.d("PERMISSION DIALOG", "Old API, no permission request needed")
-            statsNotificationManager.createStatsNotificationChannel()
-            statsNotificationManager.startStatsNotificationBroadcast()
+            val intent = Intent(this, StatsNotificationService::class.java)
+            ContextCompat.startForegroundService(this, intent)
         }
 
 
@@ -75,6 +71,5 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d("PERMISSION DIALOG", "running onDestroy")
-        statsNotificationManager.destroyStatsNotificationBroadcast()
     }
 }
