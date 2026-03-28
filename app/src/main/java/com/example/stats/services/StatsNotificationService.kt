@@ -36,13 +36,6 @@ class StatsNotificationService: Service() {
         startForeground(1, statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value))
 
         scope.launch {
-//            batteryStateRepository.batteryStateFlow.collect { batteryState ->
-//                val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//                val notification = statsNotificationManager.buildStatsNotification(batteryState)
-//                notificationManager.notify(1, notification)
-//                Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
-//            }
-
             while(isActive) {
                 val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 val notification = statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
