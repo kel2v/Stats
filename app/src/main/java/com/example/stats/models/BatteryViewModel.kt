@@ -18,7 +18,7 @@ class BatteryViewModel @Inject constructor(@ApplicationContext private val appCo
 
     fun togglePersistenceNotification() {
         val intent = Intent(appContext, StatsNotificationService::class.java)
-        if(StatsNotificationService.isRunning) {
+        if(StatsNotificationService.isRunning.value) {
             appContext.stopService(intent)
         } else {
             ContextCompat.startForegroundService(appContext,intent)

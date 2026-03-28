@@ -25,6 +25,7 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
         })
 ) {
     val batteryState by batteryViewModel.batteryStateStateFlow.collectAsState()
+    val isRunning by StatsNotificationService.isRunning.collectAsState()
 
     Column {
         ListItem(parameterName = "battery type", parameterValue = batteryState.technology?:"null")
@@ -40,7 +41,7 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
             onClick = { batteryViewModel.togglePersistenceNotification() },
             modifier = Modifier.height(60.dp).fillMaxWidth()
         ) {
-            Text(if(StatsNotificationService.isRunning) "Persistence Notification is ON" else "Persistence Notification is OFF")
+            Text(if(isRunning) "Persistence Notification is ON" else "Persistence Notification is OFF")
         }
     }
 

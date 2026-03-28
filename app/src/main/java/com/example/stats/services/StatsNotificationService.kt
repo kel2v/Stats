@@ -7,9 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.example.stats.data.BatteryStateRepository
 import com.example.stats.notification.StatsNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,8 +30,8 @@ class StatsNotificationService: Service() {
     private lateinit var scope: CoroutineScope
 
     companion object {
-        var isRunning by mutableStateOf(false)
-            private set
+        private var _isRunning = MutableStateFlow(false)
+        val isRunning = _isRunning.asStateFlow()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -43,7 +42,7 @@ class StatsNotificationService: Service() {
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
         statsNotificationManager.createStatsNotificationChannel()
-        isRunning = true
+        _isRunning.value = true
         startForeground(1, statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value))
 
         scope.launch {
@@ -64,7 +63,7 @@ class StatsNotificationService: Service() {
         Log.d("PERMISSION DIALOG", "Running StatsNotificationService.onDestroy")
         scope.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)
-        isRunning = false
+        _isRunning.value = false
         super.onDestroy()
     }
 }

@@ -28,7 +28,7 @@ class MainActivity: ComponentActivity() {
                 Log.d("PERMISSION DIALOG", "User responded for permission request")
                 if (isGranted) {
                     Log.d("PERMISSION DIALOG", "Permission granted")
-                    if(!StatsNotificationService.isRunning) {
+                    if(!StatsNotificationService.isRunning.value) {
                         val intent = Intent(this, StatsNotificationService::class.java)
                         ContextCompat.startForegroundService(this, intent)
                     }
@@ -39,7 +39,7 @@ class MainActivity: ComponentActivity() {
             requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             Log.d("PERMISSION DIALOG", "Old API, no permission request needed")
-            if(!StatsNotificationService.isRunning) {
+            if(!StatsNotificationService.isRunning.value) {
                 val intent = Intent(this, StatsNotificationService::class.java)
                 ContextCompat.startForegroundService(this, intent)
             }
