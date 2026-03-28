@@ -9,11 +9,10 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.example.stats.data.BatteryStateRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class StatsNotificationChannel @Inject constructor(@ApplicationContext private val appContext: Context, private val batteryStateRepository: BatteryStateRepository) {
+class StatsNotificationChannel @Inject constructor(@ApplicationContext private val appContext: Context) {
     private lateinit var channelId: String
     private lateinit var channelName: String
     private var importance: Int = 0
@@ -49,7 +48,8 @@ class StatsNotificationChannel @Inject constructor(@ApplicationContext private v
         with(NotificationManagerCompat.from(appContext)) {
             if(ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 notify(id, notification)
-                Log.d("PERMISSION DIALOG", "temp: ${batteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${batteryStateRepository.batteryStateStateFlow.value.level}%\nvoltage: ${batteryStateRepository.batteryStateStateFlow.value.voltage} V")
+                Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
+                //Log.d("PERMISSION DIALOG", "temp: ${batteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${batteryStateRepository.batteryStateStateFlow.value.level}%\nvoltage: ${batteryStateRepository.batteryStateStateFlow.value.voltage} V")
             } else {
                 Log.d("PERMISSION DIALOG", "Unable to post notification. No permission to post")
             }

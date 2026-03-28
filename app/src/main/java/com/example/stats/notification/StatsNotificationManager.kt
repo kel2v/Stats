@@ -20,10 +20,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context, private val batteryStateRepository: BatteryStateRepository) {
+class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context, batteryStateRepository: BatteryStateRepository, private val channel: StatsNotificationChannel) {
     private lateinit var callbackCoroutine: Job
-    @Inject
-    lateinit var channel: StatsNotificationChannel
+    private val batteryStateStateFlow = batteryStateRepository.batteryStateStateFlow
 
     fun createStatsNotificationChannel() {
         Log.d("PERMISSION DIALOG", "Creating notification channel")
@@ -41,13 +40,13 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
         Log.d("PERMISSION DIALOG", "Starting notification broadcast")
         callbackCoroutine = CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             while(true) {
-                showStatsLocalNotification(batteryStateRepository.batteryStateStateFlow.value)
+                showStatsLocalNotification()
                 delay(1000)
             }
         }
     }
 
-    fun buildStatsNotification(): Notification {
+    fun buildStatsNotification(batteryState: BatteryState): Notification {
         val channelId = "Stats"
         val intent = Intent(appContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -59,8 +58,8 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
 
         val notification = NotificationCompat.Builder(appContext, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("temp: ${batteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${batteryStateRepository.batteryStateStateFlow.value.level}%")
-            .setContentText("voltage: ${batteryStateRepository.batteryStateStateFlow.value.voltage} V")
+            .setContentTitle("temp: ${batteryState.temperature} Celsius | level = ${batteryState.level}%")
+            .setContentText("voltage: ${batteryState.voltage} V")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
@@ -70,10 +69,10 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
         return notification
     }
 
-    private fun showStatsLocalNotification(batteryState: BatteryState) {
+    private fun showStatsLocalNotification() {
         Log.d("PERMISSION DIALOG", "posting new notification ...")
 
-        val notification = buildStatsNotification()
+        val notification = buildStatsNotification(batteryStateStateFlow.value)
         channel.postNotification(notification, 1001)
     }
 
