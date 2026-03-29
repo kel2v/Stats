@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
+import com.example.stats.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,22 +40,22 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
                     technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
 
                     health = when (intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)) {
-                        BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
-                        BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
-                        BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
-                        BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
-                        BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Overvoltage"
-                        BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Unspecified failure"
-                        BatteryManager.BATTERY_HEALTH_UNKNOWN -> "Unknown"
-                        else -> "Unknown"
+                        BatteryManager.BATTERY_HEALTH_COLD -> appContext.getString(R.string.battery_health_cold)
+                        BatteryManager.BATTERY_HEALTH_DEAD -> appContext.getString(R.string.battery_health_dead)
+                        BatteryManager.BATTERY_HEALTH_GOOD -> appContext.getString(R.string.battery_health_good)
+                        BatteryManager.BATTERY_HEALTH_OVERHEAT -> appContext.getString(R.string.battery_health_overheat)
+                        BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> appContext.getString(R.string.battery_health_over_voltage)
+                        BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> appContext.getString(R.string.battery_health_unspecified_failure)
+                        BatteryManager.BATTERY_HEALTH_UNKNOWN -> appContext.getString(R.string.battery_health_unknown)
+                        else -> appContext.getString(R.string.battery_health_unknown)
                     },
                     chargingStatus = when(intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)) {
-                        BatteryManager.BATTERY_STATUS_FULL -> "Full"
-                        BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
-                        BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
-                        BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not charging"
-                        BatteryManager.BATTERY_STATUS_UNKNOWN -> "Unknown"
-                        else -> "Unknown"
+                        BatteryManager.BATTERY_STATUS_FULL -> appContext.getString(R.string.battery_status_full)
+                        BatteryManager.BATTERY_STATUS_CHARGING -> appContext.getString(R.string.battery_status_charging)
+                        BatteryManager.BATTERY_STATUS_DISCHARGING -> appContext.getString(R.string.battery_status_discharging)
+                        BatteryManager.BATTERY_STATUS_NOT_CHARGING -> appContext.getString(R.string.battery_status_not_charging)
+                        BatteryManager.BATTERY_STATUS_UNKNOWN -> appContext.getString(R.string.battery_status_unknown)
+                        else -> appContext.getString(R.string.battery_status_unknown)
                     }
                 )
 
@@ -75,10 +76,10 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
         initialValue = BatteryState(
             level = Int.MIN_VALUE,
             voltage = Float.MIN_VALUE,
-            chargingStatus = "NA",
+            chargingStatus = appContext.getString(R.string.na),
             temperature = Float.MIN_VALUE,
             technology = null,
-            health = "NA"
+            health = appContext.getString(R.string.na)
         )
     )
 }
