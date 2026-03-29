@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.example.stats.utils.BatteryStateRepositoryUtils
 
 @Singleton
 class BatteryStateRepository @Inject constructor(@ApplicationContext private val appContext: Context) {
@@ -33,9 +34,13 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             override fun onReceive(context: Context?, intent: Intent?) {
                 if(intent == null) return
 
+                val batteryStateRepositoryUtils = BatteryStateRepositoryUtils()
                 val state = BatteryState(
-                    level = (intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100) / intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1),
-                    temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) / 10f,
+                    level = batteryStateRepositoryUtils.getBatteryLevelPercentage(
+                        level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),
+                        scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                    ),
+                    temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE) / 10f,
                     voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)/1000f,
                     technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
 
