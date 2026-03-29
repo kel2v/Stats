@@ -10,4 +10,14 @@ class BatteryStateRepositoryUtils {
 
         return percentage
     }
+
+    fun getTemperatureInCelsius(rawValue: Int): Float {
+        val tempInCelsius = if(rawValue != Int.MIN_VALUE) {
+            rawValue / 10f
+        } else {
+            Float.MAX_VALUE * -1
+        }
+
+        return tempInCelsius
+    }
 }

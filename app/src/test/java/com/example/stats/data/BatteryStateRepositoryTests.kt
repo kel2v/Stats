@@ -134,4 +134,134 @@ class BatteryStateRepositoryTests {
     fun getBatteryLevelPercentage_invalidInput_returnsError(level: Int, scale: Int, expected: Int) {
         assertEquals(BatteryStateRepositoryUtils().getBatteryLevelPercentage(level, scale), expected)
     }
+
+
+    @ParameterizedTest(name = "rawValue={0} -> temp={1}°C")
+    @CsvSource(
+        // Arbitrary values
+        "-1000000, -100000.0",
+
+        "-100000, -10000.0",
+
+        "-10000, -1000.0",
+
+        "-1002, -100.2",
+        "-1001, -100.1",
+        "-1000, -100.0",
+        "-999, -99.9",
+        "-998, -99.8",
+
+        "-752, -75.2",
+        "-751, -75.1",
+        "-750, -75.0",
+        "-749, -74.9",
+        "-748, -74.8",
+
+        "-502, -50.2",
+        "-501, -50.1",
+        "-500, -50.0",
+        "-499, -49.9",
+        "-498, -49.8",
+
+        "-252, -25.2",
+        "-251, -25.1",
+        "-250, -25.0",
+        "-249, -24.9",
+        "-248, -24.8",
+
+        "-102, -10.2",
+        "-101, -10.1",
+        "-100, -10.0",
+        "-99, -9.9",
+        "-98, -9.8",
+
+        "-77, -7.7",
+        "-76, -7.6",
+        "-75, -7.5",
+        "-74, -7.4",
+        "-73, -7.3",
+
+        "-52, -5.2",
+        "-51, -5.1",
+        "-50, -5.0",
+        "-49, -4.9",
+        "-48, -4.8",
+
+        "-27, -2.7",
+        "-26, -2.6",
+        "-25, -2.5",
+        "-24, -2.4",
+        "-23, -2.3",
+
+        "-2, -0.2",
+        "-1, -0.1",
+        "-0, 0.0",
+        "1, 0.1",
+        "2, 0.2",
+
+        "27, 2.7",
+        "26, 2.6",
+        "25, 2.5",
+        "24, 2.4",
+        "23, 2.3",
+
+        "52, 5.2",
+        "51, 5.1",
+        "50, 5.0",
+        "49, 4.9",
+        "48, 4.8",
+
+        "77, 7.7",
+        "76, 7.6",
+        "75, 7.5",
+        "74, 7.4",
+        "73, 7.3",
+
+        "102, 10.2",
+        "101, 10.1",
+        "100, 10.0",
+        "99, 9.9",
+        "98, 9.8",
+
+        "252, 25.2",
+        "251, 25.1",
+        "250, 25.0",
+        "249, 24.9",
+        "248, 24.8",
+
+        "502, 50.2",
+        "501, 50.1",
+        "500, 50.0",
+        "499, 49.9",
+        "498, 49.8",
+
+        "752, 75.2",
+        "751, 75.1",
+        "750, 75.0",
+        "749, 74.9",
+        "748, 74.8",
+
+        "1002, 100.2",
+        "1001, 100.1",
+        "1000, 100.0",
+        "999, 99.9",
+        "998, 99.8",
+
+        "10000, 1000.0",
+
+        "100000, 10000.0",
+
+        "1000000, 100000.0"
+    )
+    fun getTemperatureInCelsius_validInput_correctOutput(rawValue: Int, expected: Float) {
+        assertEquals(BatteryStateRepositoryUtils().getTemperatureInCelsius(rawValue), expected)
+    }
+
+    @ParameterizedTest(name = "rawValue={0} -> temp={1}°C")
+    @CsvSource(
+        "-2147483648, -3.4028235E38"
+    )
+    fun getTemperatureInCelsius_invalidInput_returnError(rawValue: Int, expected: Float) {
+        assertEquals(BatteryStateRepositoryUtils().getTemperatureInCelsius(rawValue), expected)
+    }
 }

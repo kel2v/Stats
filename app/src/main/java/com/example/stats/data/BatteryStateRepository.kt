@@ -40,7 +40,9 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
                         level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),
                         scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
                     ),
-                    temperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE) / 10f,
+                    temperature = batteryStateRepositoryUtils.getTemperatureInCelsius(
+                        intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE)
+                    ),
                     voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)/1000f,
                     technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
 
