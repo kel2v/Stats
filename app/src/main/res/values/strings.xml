@@ -30,5 +30,5 @@
     <string name="battery_status_discharging">Discharging</string>
     <string name="battery_status_not_charging">Not charging</string>
     <string name="battery_status_unknown">Unknown</string>
-    <string name="na">NA</string>
+    <string name="not_available">Not available</string>
 </resources>

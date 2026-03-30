@@ -76,10 +76,10 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
         initialValue = BatteryState(
             level = Int.MIN_VALUE,
             voltage = Float.MIN_VALUE,
-            chargingStatus = appContext.getString(R.string.na),
+            chargingStatus = appContext.getString(R.string.not_available),
             temperature = Float.MIN_VALUE,
             technology = "Not available",
-            health = appContext.getString(R.string.na)
+            health = appContext.getString(R.string.not_available)
         )
     )
 }
