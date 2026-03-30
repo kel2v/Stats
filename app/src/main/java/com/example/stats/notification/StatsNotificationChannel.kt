@@ -34,7 +34,7 @@ class StatsNotificationChannel @Inject constructor(@ApplicationContext private v
     }
 
     fun createChannel() {
-        Log.d("PERMISSION DIALOG", "Creating notification channel")
+        Log.d("DEBUGGING LOGS", "Creating notification channel")
 
         channel = NotificationChannel(channelId, channelName, importance).apply {
             description = channelDescription
@@ -48,10 +48,9 @@ class StatsNotificationChannel @Inject constructor(@ApplicationContext private v
         with(NotificationManagerCompat.from(appContext)) {
             if(ContextCompat.checkSelfPermission(appContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 notify(id, notification)
-                Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
-                //Log.d("PERMISSION DIALOG", "temp: ${batteryStateRepository.batteryStateStateFlow.value.temperature} Celsius | level = ${batteryStateRepository.batteryStateStateFlow.value.level}%\nvoltage: ${batteryStateRepository.batteryStateStateFlow.value.voltage} V")
+                Log.d("DEBUGGING LOGS", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
             } else {
-                Log.d("PERMISSION DIALOG", "Unable to post notification. No permission to post")
+                Log.d("DEBUGGING LOGS", "Unable to post notification. No permission to post")
             }
         }
     }

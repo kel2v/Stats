@@ -24,7 +24,7 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
     private lateinit var callbackCoroutine: Job
 
     fun createStatsNotificationChannel() {
-        Log.d("PERMISSION DIALOG", "Creating notification channel")
+        Log.d("DEBUGGING LOGS", "Creating notification channel")
 
         channel.init(
             _channelId = "Stats",
@@ -36,7 +36,7 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
     }
 
     fun startStatsNotificationBroadcast() {
-        Log.d("PERMISSION DIALOG", "Starting notification broadcast")
+        Log.d("DEBUGGING LOGS", "Starting notification broadcast")
         callbackCoroutine = CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
             while(true) {
                 showStatsLocalNotification()
@@ -69,14 +69,14 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
     }
 
     private fun showStatsLocalNotification() {
-        Log.d("PERMISSION DIALOG", "posting new notification ...")
+        Log.d("DEBUGGING LOGS", "posting new notification ...")
 
         val notification = buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
         channel.postNotification(notification, 1001)
     }
 
     fun destroyStatsNotificationBroadcast() {
-        Log.d("PERMISSION DIALOG", "Destroying notification broadcast")
+        Log.d("DEBUGGING LOGS", "Destroying notification broadcast")
         callbackCoroutine.cancel()
     }
 }

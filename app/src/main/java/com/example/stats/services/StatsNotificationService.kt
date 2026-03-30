@@ -37,7 +37,7 @@ class StatsNotificationService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("PERMISSION DIALOG", "Running onStartCommand")
+        Log.d("DEBUGGING LOGS", "Running onStartCommand")
 
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -50,17 +50,17 @@ class StatsNotificationService: Service() {
                 val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 val notification = statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
                 notificationManager.notify(1, notification)
-                Log.d("PERMISSION DIALOG", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
+                Log.d("DEBUGGING LOGS", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
                 delay(1000)
             }
         }
 
-        Log.d("PERMISSION DIALOG", "Exiting onStartCommand")
+        Log.d("DEBUGGING LOGS", "Exiting onStartCommand")
         return START_STICKY
     }
 
     override fun onDestroy() {
-        Log.d("PERMISSION DIALOG", "Running StatsNotificationService.onDestroy")
+        Log.d("DEBUGGING LOGS", "Running StatsNotificationService.onDestroy")
         scope.cancel()
         stopForeground(STOP_FOREGROUND_REMOVE)
         _isRunning.value = false
