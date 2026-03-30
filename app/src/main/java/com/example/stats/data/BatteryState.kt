@@ -5,6 +5,6 @@ data class BatteryState(
     val voltage: Float,
     val chargingStatus: String,
     val temperature: Float,
-    val technology: String?,
+    val technology: String,
     val health: String
 )

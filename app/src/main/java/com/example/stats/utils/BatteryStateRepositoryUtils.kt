@@ -20,4 +20,19 @@ class BatteryStateRepositoryUtils {
 
         return tempInCelsius
     }
+
+    fun getVoltage(rawValue: Int): Float {
+        val voltage = if(rawValue != Int.MIN_VALUE) {
+            rawValue / 1000f
+        } else {
+            Float.MAX_VALUE * -1
+        }
+
+        return voltage
+    }
+
+    fun getTechnology(rawString: String?): String {
+        val technology = rawString ?: "Not available"
+        return technology
+    }
 }

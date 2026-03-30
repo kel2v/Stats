@@ -43,8 +43,10 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
                     temperature = batteryStateRepositoryUtils.getTemperatureInCelsius(
                         intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Int.MIN_VALUE)
                     ),
-                    voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)/1000f,
-                    technology = intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY),
+                    voltage = batteryStateRepositoryUtils.getVoltage(
+                        intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
+                    ),
+                    technology = batteryStateRepositoryUtils.getTechnology(intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)),
 
                     health = when (intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)) {
                         BatteryManager.BATTERY_HEALTH_COLD -> appContext.getString(R.string.battery_health_cold)
@@ -85,7 +87,7 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             voltage = Float.MIN_VALUE,
             chargingStatus = appContext.getString(R.string.na),
             temperature = Float.MIN_VALUE,
-            technology = null,
+            technology = "Not available",
             health = appContext.getString(R.string.na)
         )
     )

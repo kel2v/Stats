@@ -4,6 +4,7 @@ import com.example.stats.utils.BatteryStateRepositoryUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import kotlin.test.Test
 
 class BatteryStateRepositoryTests {
     @ParameterizedTest(name = "level={0}, scale={1} -> {2}%")
@@ -140,5 +141,59 @@ class BatteryStateRepositoryTests {
     )
     fun getTemperatureInCelsius_invalidInput_returnError(rawValue: Int, expected: Float) {
         assertEquals(BatteryStateRepositoryUtils().getTemperatureInCelsius(rawValue), expected)
+    }
+
+
+    @ParameterizedTest(name = "rawValue={0} -> volts={1}V")
+    @CsvSource(
+        "-501, -0.501",
+        "-500, -0.500",
+        "-249, -0.249",
+        "-100, -0.100",
+        "-76, -0.076",
+        "-49, -0.049",
+        "-25, -0.025",
+
+        "-1, -0.001",
+        "-0, 0.0",
+        "1, 0.001",
+
+        "26, 0.026",
+        "51, 0.051",
+        "75, 0.075",
+        "99, 0.099",
+        "250, 0.250",
+        "501, 0.501"
+    )
+    fun getVoltage_validInput_correctOutput(rawValue: Int, expected: Float) {
+        assertEquals(BatteryStateRepositoryUtils().getVoltage(rawValue), expected)
+    }
+
+    @ParameterizedTest(name = "rawValue={0} -> volts={1}V")
+    @CsvSource(
+        "-2147483648, -3.4028235E38"
+    )
+    fun getVoltage_invalidInput_returnError(rawValue: Int, expected: Float) {
+        assertEquals(BatteryStateRepositoryUtils().getVoltage(rawValue), expected)
+    }
+
+
+
+    @ParameterizedTest(name = "rawString={0} -> technology={1}")
+    @CsvSource(
+        "Li-ion, Li-ion",
+        "LiPo, LiPo",
+        "Li-SOCl2, Li-SOCl2",
+        "Li-MnO2, Li-MnO2",
+        "NiMH, NiMH",
+        "Button, Button"
+    )
+    fun getTechnology_validInput_correctOutput(rawString: String?, expected: String) {
+        assertEquals(BatteryStateRepositoryUtils().getTechnology(rawString), expected)
+    }
+
+    @Test
+    fun getTechnology_invalidInput_returnError() {
+        assertEquals(BatteryStateRepositoryUtils().getTechnology(null), "Not available")
     }
 }
