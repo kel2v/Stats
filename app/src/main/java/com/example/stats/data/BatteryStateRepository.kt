@@ -46,18 +46,12 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
                     voltage = batteryStateRepositoryUtils.getVoltage(
                         intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
                     ),
-                    technology = batteryStateRepositoryUtils.getTechnology(intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)),
+                    technology = batteryStateRepositoryUtils.getTechnology(
+                        intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)
+                    ),
 
-                    health = when (intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)) {
-                        BatteryManager.BATTERY_HEALTH_COLD -> appContext.getString(R.string.battery_health_cold)
-                        BatteryManager.BATTERY_HEALTH_DEAD -> appContext.getString(R.string.battery_health_dead)
-                        BatteryManager.BATTERY_HEALTH_GOOD -> appContext.getString(R.string.battery_health_good)
-                        BatteryManager.BATTERY_HEALTH_OVERHEAT -> appContext.getString(R.string.battery_health_overheat)
-                        BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> appContext.getString(R.string.battery_health_over_voltage)
-                        BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> appContext.getString(R.string.battery_health_unspecified_failure)
-                        BatteryManager.BATTERY_HEALTH_UNKNOWN -> appContext.getString(R.string.battery_health_unknown)
-                        else -> appContext.getString(R.string.battery_health_unknown)
-                    },
+                    health = batteryStateRepositoryUtils.getHealth(intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)),
+
                     chargingStatus = when(intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)) {
                         BatteryManager.BATTERY_STATUS_FULL -> appContext.getString(R.string.battery_status_full)
                         BatteryManager.BATTERY_STATUS_CHARGING -> appContext.getString(R.string.battery_status_charging)

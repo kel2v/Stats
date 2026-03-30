@@ -1,5 +1,7 @@
 package com.example.stats.utils
 
+import android.os.BatteryManager
+
 class BatteryStateRepositoryUtils {
     fun getBatteryLevelPercentage(level: Int, scale: Int): Int {
         val percentage = if(level >= 0 && scale > 0  && level <= scale) {
@@ -34,5 +36,20 @@ class BatteryStateRepositoryUtils {
     fun getTechnology(rawString: String?): String {
         val technology = rawString ?: "Not available"
         return technology
+    }
+
+    fun getHealth(rawValue: Int): String {
+        val health = when(rawValue) {
+            BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
+            BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
+            BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
+            BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheated"
+            BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Overvoltage"
+            BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Failure"
+            BatteryManager.BATTERY_HEALTH_UNKNOWN -> "Unknown"
+            else -> "Unknown"
+        }
+
+        return health
     }
 }

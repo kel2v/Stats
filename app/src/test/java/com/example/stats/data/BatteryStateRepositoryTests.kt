@@ -1,5 +1,6 @@
 package com.example.stats.data
 
+import android.os.BatteryManager
 import com.example.stats.utils.BatteryStateRepositoryUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
@@ -195,5 +196,42 @@ class BatteryStateRepositoryTests {
     @Test
     fun getTechnology_invalidInput_returnError() {
         assertEquals(BatteryStateRepositoryUtils().getTechnology(null), "Not available")
+    }
+
+
+
+    @Test
+    fun getHealth_batteryHealthCold_returnCold() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_COLD), "Cold")
+    }
+
+    @Test
+    fun getHealth_batteryHealthDead_returnDead() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_DEAD), "Dead")
+    }
+
+    @Test
+    fun getHealth_batteryHealthGood_returnGood() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_GOOD), "Good")
+    }
+
+    @Test
+    fun getHealth_batteryHealthOverheat_returnOverheated() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_OVERHEAT), "Overheated")
+    }
+
+    @Test
+    fun getHealth_batteryHealthOverVoltage_returnOvervoltage() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE), "Overvoltage")
+    }
+
+    @Test
+    fun getHealth_batteryHealthUnspecifiedFailure_returnFailure() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE), "Failure")
+    }
+
+    @Test
+    fun getHealth_batteryHealthUnknown_returnUnknown() {
+        assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_UNKNOWN), "Unknown")
     }
 }
