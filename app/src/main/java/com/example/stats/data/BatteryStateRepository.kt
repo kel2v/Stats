@@ -50,16 +50,13 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
                         intent.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY)
                     ),
 
-                    health = batteryStateRepositoryUtils.getHealth(intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)),
+                    health = batteryStateRepositoryUtils.getHealth(
+                        intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
+                    ),
 
-                    chargingStatus = when(intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)) {
-                        BatteryManager.BATTERY_STATUS_FULL -> appContext.getString(R.string.battery_status_full)
-                        BatteryManager.BATTERY_STATUS_CHARGING -> appContext.getString(R.string.battery_status_charging)
-                        BatteryManager.BATTERY_STATUS_DISCHARGING -> appContext.getString(R.string.battery_status_discharging)
-                        BatteryManager.BATTERY_STATUS_NOT_CHARGING -> appContext.getString(R.string.battery_status_not_charging)
-                        BatteryManager.BATTERY_STATUS_UNKNOWN -> appContext.getString(R.string.battery_status_unknown)
-                        else -> appContext.getString(R.string.battery_status_unknown)
-                    }
+                    chargingStatus = batteryStateRepositoryUtils.getChargingStatus(
+                        intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
+                    )
                 )
 
                 trySend(state)

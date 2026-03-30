@@ -52,4 +52,17 @@ class BatteryStateRepositoryUtils {
 
         return health
     }
+
+    fun getChargingStatus(rawValue: Int): String {
+        val chargingStatus = when(rawValue) {
+            BatteryManager.BATTERY_STATUS_FULL -> "Full"
+            BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
+            BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
+            BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not charging"
+            BatteryManager.BATTERY_STATUS_UNKNOWN -> "Unknown"
+            else -> "Unknown"
+        }
+
+        return chargingStatus
+    }
 }

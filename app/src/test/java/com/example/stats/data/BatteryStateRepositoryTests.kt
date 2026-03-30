@@ -234,4 +234,30 @@ class BatteryStateRepositoryTests {
     fun getHealth_batteryHealthUnknown_returnUnknown() {
         assertEquals(BatteryStateRepositoryUtils().getHealth(BatteryManager.BATTERY_HEALTH_UNKNOWN), "Unknown")
     }
+
+
+    @Test
+    fun getChargingStatus_statusFull_returnFull() {
+        assertEquals(BatteryStateRepositoryUtils().getChargingStatus(BatteryManager.BATTERY_STATUS_FULL), "Full")
+    }
+
+    @Test
+    fun getChargingStatus_statusCharging_returnCharging() {
+        assertEquals(BatteryStateRepositoryUtils().getChargingStatus(BatteryManager.BATTERY_STATUS_CHARGING), "Charging")
+    }
+
+    @Test
+    fun getChargingStatus_statusDischarging_returnDischarging() {
+        assertEquals(BatteryStateRepositoryUtils().getChargingStatus(BatteryManager.BATTERY_STATUS_DISCHARGING), "Discharging")
+    }
+
+    @Test
+    fun getChargingStatus_statusNotCharging_returnNotCharging() {
+        assertEquals(BatteryStateRepositoryUtils().getChargingStatus(BatteryManager.BATTERY_STATUS_NOT_CHARGING), "Not charging")
+    }
+
+    @Test
+    fun getChargingStatus_statusUnknown_returnUnknown() {
+        assertEquals(BatteryStateRepositoryUtils().getChargingStatus(BatteryManager.BATTERY_STATUS_UNKNOWN), "Unknown")
+    }
 }
