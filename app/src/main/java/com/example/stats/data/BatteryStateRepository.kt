@@ -21,16 +21,10 @@ import com.example.stats.utils.BatteryStateRepositoryUtils
 
 @Singleton
 class BatteryStateRepository @Inject constructor(@ApplicationContext private val appContext: Context) {
-
-    // This ia a Flow object that emits BatteryState whenever new Intent indicating Intent.ACTION_BATTERY_CHANGED is broadcasted.
-    // It is defined lazy, means it is initialized on its first access.
     val batteryStateFlow = callbackFlow {
-        Log.d("PERMISSION DIALOG", "callbackFlow is started executing")
+        Log.d("DEBUGGING LOGS", "callbackFlow is started executing")
 
-        // creates an object of type BroadcastReceiver that also overrides `onReceive` method, which is called by Android when any Intent of Intent.ACTION_BATTERY_CHANGED type occurs
         val receiver = object : BroadcastReceiver() {
-
-            // It is called by the Android whenever an Intent of Intent.ACTION_BATTERY_CHANGED type occurs
             override fun onReceive(context: Context?, intent: Intent?) {
                 if(intent == null) return
 
@@ -63,7 +57,10 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             }
         }
 
-        appContext.registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        appContext.registerReceiver(
+            receiver,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        )
 
         awaitClose {
             appContext.unregisterReceiver(receiver)
@@ -78,7 +75,7 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             voltage = Float.MIN_VALUE,
             chargingStatus = appContext.getString(R.string.not_available),
             temperature = Float.MIN_VALUE,
-            technology = "Not available",
+            technology = appContext.getString(R.string.not_available),
             health = appContext.getString(R.string.not_available)
         )
     )
