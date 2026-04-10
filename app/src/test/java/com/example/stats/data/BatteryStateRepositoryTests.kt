@@ -2,10 +2,10 @@ package com.example.stats.data
 
 import android.os.BatteryManager
 import com.example.stats.utils.BatteryStateRepositoryUtils
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class BatteryStateRepositoryTests {
     @ParameterizedTest(name = "level={0}, scale={1} -> {2}%")

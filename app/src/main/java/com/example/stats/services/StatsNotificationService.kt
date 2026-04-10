@@ -30,7 +30,7 @@ class StatsNotificationService: Service() {
     private lateinit var scope: CoroutineScope
 
     companion object {
-        private var _isRunning = MutableStateFlow(false)
+        var _isRunning = MutableStateFlow(false)
         val isRunning = _isRunning.asStateFlow()
     }
 

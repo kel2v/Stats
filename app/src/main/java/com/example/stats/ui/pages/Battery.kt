@@ -11,12 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import com.example.stats.models.BatteryViewModel
 import com.example.stats.services.StatsNotificationService
+import com.example.stats.models.BatteryViewModel
 import com.example.stats.ui.listitem.ListItem
+import com.example.stats.utils.StatsNotificationServiceController
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -26,9 +28,10 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
 ) {
     val batteryState by batteryViewModel.batteryStateStateFlow.collectAsState()
     val isRunning by StatsNotificationService.isRunning.collectAsState()
+    val appContext = LocalContext.current.applicationContext
 
     Column {
-        ListItem(parameterName = "battery type", parameterValue = batteryState.technology?:"null")
+        ListItem(parameterName = "battery type", parameterValue = batteryState.technology)
         ListItem(parameterName = "Battery level", parameterValue = "${batteryState.level}%")
         ListItem(parameterName = "Battery voltage", parameterValue = "${batteryState.voltage} V")
         ListItem(parameterName = "Battery temperature", parameterValue = "${batteryState.temperature} Celsius")
@@ -38,7 +41,7 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
         Spacer(Modifier.height(40.dp))
 
         Button(
-            onClick = { batteryViewModel.togglePersistenceNotification() },
+            onClick = { batteryViewModel.togglePersistenceNotification(StatsNotificationServiceController(appContext)) },
             modifier = Modifier.height(60.dp).fillMaxWidth()
         ) {
             Text(if(isRunning) "Persistence Notification is ON" else "Persistence Notification is OFF")
