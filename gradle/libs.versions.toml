@@ -32,6 +32,9 @@
     espressoCore = "3.7.0"
     junitJupiter = "6.0.3"
 
+    #Graphing
+    vico = "2.1.4"
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -65,3 +68,5 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+patrykandpatrick-vico-compose = {group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico"}

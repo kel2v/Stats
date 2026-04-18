@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.patrykandpatrick.vico.compose)
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
