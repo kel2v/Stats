@@ -1,12 +1,8 @@
 package com.example.stats.utils
 
-import android.icu.util.TimeZone
 import com.example.stats.data.TimestampBasedTimeInterval
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Calendar
-import java.util.Date
 
 class BatteryTempRepositoryUtils {
     fun convertDayIntoTimestampBasedTimeRange(
