@@ -1,4 +1,4 @@
-package com.example.stats.data
+package com.example.stats.data_structure
 
 data class BatteryState(
     val level: Int,

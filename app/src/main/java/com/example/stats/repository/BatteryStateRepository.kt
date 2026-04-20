@@ -1,4 +1,4 @@
-package com.example.stats.data
+package com.example.stats.repository
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,6 +7,8 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
 import com.example.stats.R
+import com.example.stats.data_structure.BatteryState
+import com.example.stats.utils.BatteryStateRepositoryUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +19,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.example.stats.utils.BatteryStateRepositoryUtils
 
 @Singleton
 class BatteryStateRepository @Inject constructor(@ApplicationContext private val appContext: Context) {
@@ -45,11 +46,17 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
                     ),
 
                     health = batteryStateRepositoryUtils.getHealth(
-                        intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
+                        intent.getIntExtra(
+                            BatteryManager.EXTRA_HEALTH,
+                            BatteryManager.BATTERY_HEALTH_UNKNOWN
+                        )
                     ),
 
                     chargingStatus = batteryStateRepositoryUtils.getChargingStatus(
-                        intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
+                        intent.getIntExtra(
+                            BatteryManager.EXTRA_STATUS,
+                            BatteryManager.BATTERY_STATUS_UNKNOWN
+                        )
                     )
                 )
 

@@ -7,8 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import com.example.stats.data.BatteryStateRepository
 import com.example.stats.notification.StatsNotificationManager
+import com.example.stats.repository.BatteryStateRepository
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope

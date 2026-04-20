@@ -1,6 +1,6 @@
 package com.example.stats.utils
 
-import com.example.stats.data.TimestampBasedTimeInterval
+import com.example.stats.data_structure.TimestampInterval
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -29,13 +29,13 @@ class BatteryTempRepositoryUtilsTest {
                     Arguments.of(
                         2028, 2, 29,
                         zoneIdOfUTC,
-                        TimestampBasedTimeInterval(1835395200, 1835481599)
+                        TimestampInterval(1835395200, 1835481599)
                     ),
 
                     Arguments.of(
                         2040, 2, 29,
                         zoneIdOfUTC,
-                        TimestampBasedTimeInterval(2214086400, 2214172799)
+                        TimestampInterval(2214086400, 2214172799)
                     ),
 
 
@@ -45,13 +45,13 @@ class BatteryTempRepositoryUtilsTest {
                     Arguments.of(
                         2028, 2, 29,
                         zoneIdOfAsiaKolkata,
-                        TimestampBasedTimeInterval(1835395200 + asiaKolkataOffset, 1835481599 + asiaKolkataOffset)
+                        TimestampInterval(1835395200 + asiaKolkataOffset, 1835481599 + asiaKolkataOffset)
                     ),
 
                     Arguments.of(
                         2040, 2, 29,
                         zoneIdOfAsiaKolkata,
-                        TimestampBasedTimeInterval(2214086400 + asiaKolkataOffset, 2214172799 + asiaKolkataOffset)
+                        TimestampInterval(2214086400 + asiaKolkataOffset, 2214172799 + asiaKolkataOffset)
                     ),
 
 
@@ -61,13 +61,13 @@ class BatteryTempRepositoryUtilsTest {
                     Arguments.of(
                         2028, 2, 29,
                         zoneIdOfAsiaTokyo,
-                        TimestampBasedTimeInterval(1835395200 + asiaTokyoOffset, 1835481599 + asiaTokyoOffset)
+                        TimestampInterval(1835395200 + asiaTokyoOffset, 1835481599 + asiaTokyoOffset)
                     ),
 
                     Arguments.of(
                         2040, 2, 29,
                         zoneIdOfAsiaTokyo,
-                        TimestampBasedTimeInterval(2214086400 + asiaTokyoOffset, 2214172799 + asiaTokyoOffset)
+                        TimestampInterval(2214086400 + asiaTokyoOffset, 2214172799 + asiaTokyoOffset)
                     ),
 
 
@@ -75,13 +75,13 @@ class BatteryTempRepositoryUtilsTest {
                     Arguments.of(
                         2028, 2, 29,
                         zoneIdOfEuropeMoscow,
-                        TimestampBasedTimeInterval(1835395200 + europeMoscowOffset, 1835481599 + europeMoscowOffset)
+                        TimestampInterval(1835395200 + europeMoscowOffset, 1835481599 + europeMoscowOffset)
                     ),
 
                     Arguments.of(
                         2040, 2, 29,
                         zoneIdOfEuropeMoscow,
-                        TimestampBasedTimeInterval(2214086400 + europeMoscowOffset, 2214172799 + europeMoscowOffset)
+                        TimestampInterval(2214086400 + europeMoscowOffset, 2214172799 + europeMoscowOffset)
                     ),
 
 
@@ -117,8 +117,8 @@ class BatteryTempRepositoryUtilsTest {
         month: Int,
         day: Int,
         zoneId: ZoneId,
-        expected: TimestampBasedTimeInterval
+        expected: TimestampInterval
     ) {
-        assertEquals(expected, BatteryTempRepositoryUtils().convertDayIntoTimestampBasedTimeRange(year, month, day, zoneId))
+        assertEquals(expected, TimestampIntervalUtils().convertDayIntoTimestampBasedInterval(year, month, day, zoneId))
     }
 }

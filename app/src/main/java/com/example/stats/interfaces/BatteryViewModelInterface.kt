@@ -1,6 +1,6 @@
 package com.example.stats.interfaces
 
-import com.example.stats.data.BatteryState
+import com.example.stats.data_structure.BatteryState
 import com.example.stats.services.StatsNotificationService
 import kotlinx.coroutines.flow.StateFlow
 

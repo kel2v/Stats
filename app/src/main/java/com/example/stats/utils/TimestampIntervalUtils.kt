@@ -1,16 +1,16 @@
 package com.example.stats.utils
 
-import com.example.stats.data.TimestampBasedTimeInterval
+import com.example.stats.data_structure.TimestampInterval
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class BatteryTempRepositoryUtils {
-    fun convertDayIntoTimestampBasedTimeRange(
+class TimestampIntervalUtils {
+    fun convertDayIntoTimestampBasedInterval(
         year: Int,
         month: Int,
         day: Int,
         zoneId: ZoneId
-    ): TimestampBasedTimeInterval {
+    ): TimestampInterval {
         val startTimestamp = LocalDateTime
             .of(year, month, day, 0, 0, 0)
             .atZone(zoneId)
@@ -21,6 +21,6 @@ class BatteryTempRepositoryUtils {
             .atZone(zoneId)
             .toEpochSecond()
 
-        return TimestampBasedTimeInterval(startTimestamp, endTimestamp)
+        return TimestampInterval(startTimestamp, endTimestamp)
     }
 }
