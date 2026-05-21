@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
@@ -47,11 +46,12 @@ class StatsNotificationService: Service() {
 
         scope.launch {
             while(isActive) {
-                val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                val notification = statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
-                notificationManager.notify(1, notification)
-                Log.d("DEBUGGING LOGS", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
-                delay(1000)
+                batteryStateRepository.batteryStateFlow.collect {value ->
+                    val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    val notification = statsNotificationManager.buildStatsNotification(value)
+                    notificationManager.notify(1, notification)
+                    Log.d("DEBUGGING LOGS", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
+                }
             }
         }
 
