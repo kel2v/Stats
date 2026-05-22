@@ -19,6 +19,9 @@ interface TimeStampedBatteryTempDao {
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertAll(newInsertList: List<TimeStampedBatteryTemp>)
 
+    @Query("DELETE FROM timeStampedBatteryTemp")
+    suspend fun deleteAll()
+
     fun getAllByDate(
         year: Int,
         month: Int,

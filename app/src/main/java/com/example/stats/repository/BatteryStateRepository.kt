@@ -16,7 +16,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,6 +34,7 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
 
                 val batteryStateRepositoryUtils = BatteryStateRepositoryUtils()
                 val state = BatteryState(
+                    timestamp = Instant.now().atZone(ZoneId.systemDefault()).toEpochSecond(),
                     level = batteryStateRepositoryUtils.getBatteryLevelPercentage(
                         level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),
                         scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
@@ -78,6 +82,7 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
         started = SharingStarted.Eagerly,
         initialValue = BatteryState(
+            timestamp = 0,
             level = Int.MIN_VALUE,
             voltage = Float.MIN_VALUE,
             chargingStatus = appContext.getString(R.string.not_available),
@@ -85,5 +90,11 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             technology = appContext.getString(R.string.not_available),
             health = appContext.getString(R.string.not_available)
         )
+    )
+
+    val batteryStateSharedFlow = batteryStateFlow.shareIn(
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+        started = SharingStarted.Eagerly,
+        replay = 0
     )
 }

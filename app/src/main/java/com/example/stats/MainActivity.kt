@@ -11,8 +11,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.stats.services.StatsNotificationService
+import com.example.stats.worker.SyncWorker
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity: ComponentActivity() {
@@ -44,6 +49,17 @@ class MainActivity: ComponentActivity() {
                 ContextCompat.startForegroundService(this, intent)
             }
         }
+
+        val periodicRequest = PeriodicWorkRequestBuilder<SyncWorker>(repeatInterval = 15, repeatIntervalTimeUnit = TimeUnit.MINUTES)
+            .addTag("Sync")
+            .build()
+
+        val workManager = WorkManager.getInstance(this.applicationContext)
+        workManager.enqueueUniquePeriodicWork(
+            "battery temp logging",
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicRequest
+        )
 
         setContent {
             StatsApp()

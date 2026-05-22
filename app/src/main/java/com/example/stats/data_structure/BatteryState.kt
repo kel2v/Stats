@@ -1,6 +1,7 @@
 package com.example.stats.data_structure
 
 data class BatteryState(
+    val timestamp: Long,
     val level: Int,
     val voltage: Float,
     val chargingStatus: String,
