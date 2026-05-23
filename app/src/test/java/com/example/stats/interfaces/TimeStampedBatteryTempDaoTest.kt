@@ -187,9 +187,7 @@ class TimeStampedBatteryTempDaoTest {
         val insertList = jan1st1970List
         insertItems(dbDao, insertList)
 
-        val resultList = getFirstValueOfFlow(
-            dbDao.getAll()
-        ).sortedBy { it -> it.timestamp }
+        val resultList = runBlocking { dbDao.getAll() }.sortedBy { it -> it.timestamp }
         val expectedList = insertList.sortedBy { it -> it.timestamp }
 
         listAssertion(expectedList, resultList)
@@ -204,9 +202,7 @@ class TimeStampedBatteryTempDaoTest {
         insertItems(dbDao, prefilledList)
         insertItems(dbDao, newInsertList)
 
-        val resultList = getFirstValueOfFlow(
-            dbDao.getAll()
-        ).sortedBy { it -> it.timestamp }
+        val resultList = runBlocking { dbDao.getAll() }.sortedBy { it -> it.timestamp }
         val expectedList = (prefilledList + newInsertList).sortedBy { it -> it.timestamp }
 
         listAssertion(expectedList, resultList)

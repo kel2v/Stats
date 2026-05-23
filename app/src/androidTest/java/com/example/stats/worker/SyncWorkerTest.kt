@@ -40,7 +40,7 @@ class SyncWorkerTest {
     lateinit var workerFactory: HiltWorkerFactory
 
     fun getAllDBData(): List<TimestampedBatteryTemp> {
-        val allDBData = runBlocking { batteryTempHistoryRepository.dbDao.getAll().first() }
+        val allDBData = runBlocking { batteryTempHistoryRepository.dbDao.getAll() }
         return allDBData
     }
 

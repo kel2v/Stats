@@ -16,9 +16,9 @@ class SyncWorker @AssistedInject constructor(@Assisted private val appContext: C
         Log.d("DEBUGGING LOGS", "from SyncWorker: batteryTempHistoryRepository's class name = ${batteryTempHistoryRepository.className}")
         return try {
             Log.d("DEBUGGING LOGS", "'battery temp logging' started")
-            Log.d("DEBUGGING LOGS", "records count before sync = ${batteryTempHistoryRepository.dbDao.getAll().first().size}")
+            Log.d("DEBUGGING LOGS", "records count before sync = ${batteryTempHistoryRepository.dbDao.getAll().size}")
             batteryTempHistoryRepository.flushBuffer()
-            Log.d("DEBUGGING LOGS", "records count after sync = ${batteryTempHistoryRepository.dbDao.getAll().first().size}")
+            Log.d("DEBUGGING LOGS", "records count after sync = ${batteryTempHistoryRepository.dbDao.getAll().size}")
             Log.d("DEBUGGING LOGS", "'battery temp logging' completed")
             Result.success()
         } catch (e: Exception) {

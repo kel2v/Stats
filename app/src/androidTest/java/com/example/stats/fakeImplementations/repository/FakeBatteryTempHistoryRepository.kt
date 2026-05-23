@@ -43,7 +43,7 @@ class FakeBatteryTempHistoryRepository @Inject constructor(@ApplicationContext p
         bufferMutex.withLock {
             Log.d("DEBUGGING LOGS", "Flushing buffer")
             dbDao.insertAll(buffer.toList())
-            Log.d("DEBUGGING LOGS", "After flushing, DB size = ${dbDao.getAll().first().size}")
+            Log.d("DEBUGGING LOGS", "After flushing, DB size = ${dbDao.getAll().size}")
             Log.d("DEBUGGING LOGS", "Clearing buffer")
             buffer.clear()
         }

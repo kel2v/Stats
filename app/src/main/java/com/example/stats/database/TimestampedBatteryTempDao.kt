@@ -11,7 +11,7 @@ import java.time.ZoneId
 @Dao
 interface TimestampedBatteryTempDao {
     @Query("SELECT * FROM timestampedBatteryTemp")
-    fun getAll(): Flow<List<TimestampedBatteryTemp>>
+    suspend fun getAll(): List<TimestampedBatteryTemp>
 
     @Query("SELECT * FROM timestampedBatteryTemp WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
     fun getByTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimestampedBatteryTemp>>

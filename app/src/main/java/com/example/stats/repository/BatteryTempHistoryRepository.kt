@@ -10,8 +10,10 @@ import com.example.stats.hilt.ApplicationCoroutineScope
 import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -71,7 +73,7 @@ class BatteryTempHistoryRepository @Inject constructor(@ApplicationContext priva
         bufferMutex.withLock {
             Log.d("DEBUGGING LOGS", "Flushing buffer")
             dbDao.insertAll(buffer.toList())
-            Log.d("DEBUGGING LOGS", "After flushing, DB size = ${dbDao.getAll().first().size}")
+            Log.d("DEBUGGING LOGS", "After flushing, DB size = ${dbDao.getAll().size}")
             Log.d("DEBUGGING LOGS", "Clearing buffer")
             buffer.clear()
         }
