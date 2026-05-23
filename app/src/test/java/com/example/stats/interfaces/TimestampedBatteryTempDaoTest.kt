@@ -98,6 +98,30 @@ class TimestampedBatteryTempDaoTest {
     }
 
 
+    @Test
+    fun getCount___emptyDatabase___zeroAsOutput() {
+        val getCountQueryResult = runBlocking { dbDao.getCount() }
+        val getAllQueryResult = runBlocking { dbDao.getAll() }
+
+        assertEquals(true, getAllQueryResult.isEmpty())
+        assertEquals(getCountQueryResult.toInt(), getAllQueryResult.size)
+    }
+
+    @Test
+    fun getCount___prefilledDatabase___correctOutput() {
+        val getAllQueryBeforePrefillResult = runBlocking { dbDao.getAll() }
+        assertEquals(true, getAllQueryBeforePrefillResult.isEmpty())
+
+        val insertList = jan1st1970List
+        insertItems(dbDao, insertList)
+
+        val getAllQueryAfterPrefillResult = runBlocking { dbDao.getAll() }
+        assertEquals(true, getAllQueryAfterPrefillResult.isNotEmpty())
+
+        val getCountQueryResult = runBlocking { dbDao.getCount() }
+
+        assertEquals(getCountQueryResult.toInt(), getAllQueryAfterPrefillResult.size)
+    }
 
     @Test
     fun getAll___validInputToFreshDatabase___correctOutput() {

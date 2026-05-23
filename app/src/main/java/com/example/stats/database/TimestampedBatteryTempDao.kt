@@ -10,6 +10,9 @@ import java.time.ZoneId
 
 @Dao
 interface TimestampedBatteryTempDao {
+    @Query("SELECT COUNT(*) FROM timestampedBatteryTemp")
+    suspend fun getCount(): Long
+
     @Query("SELECT * FROM timestampedBatteryTemp")
     suspend fun getAll(): List<TimestampedBatteryTemp>
 
