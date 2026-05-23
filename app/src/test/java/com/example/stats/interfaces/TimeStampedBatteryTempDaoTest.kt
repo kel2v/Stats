@@ -14,10 +14,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.time.ZoneId
 import kotlin.test.assertEquals
 
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36])
 class TimeStampedBatteryTempDaoTest {
     private lateinit var db: TimestampedBatteryTempDatabase
     private lateinit var dbDao: TimestampedBatteryTempDao

@@ -18,7 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.stats.fakeImplementations.hilt.HiltTestRunner"
     }
 
     buildTypes {
@@ -45,16 +45,8 @@ android {
         }
     }
 
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
-
     room {
         schemaDirectory("$projectDir/schemas")
-    }
-
-    defaultConfig {
-        testInstrumentationRunner = "com.example.stats.fakeImplementations.hilt.HiltTestRunner"
     }
 }
 
@@ -62,6 +54,10 @@ kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 dependencies {
@@ -105,6 +101,7 @@ dependencies {
 
     // test: Junit
     testImplementation(libs.junit)
+    testImplementation(libs.junit.vintage.engine)
     testImplementation(libs.junit.jupiter)
 
     // test: robolectric
