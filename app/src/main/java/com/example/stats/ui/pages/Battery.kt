@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,22 +17,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import com.example.stats.services.StatsNotificationService
 import com.example.stats.models.BatteryViewModel
+import com.example.stats.services.StatsLoggingNotificationService
 import com.example.stats.ui.listitem.ListItem
 import com.example.stats.utils.StatsNotificationServiceController
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(LocalViewModelStoreOwner.current) {
-            "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-        })
+    "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+})
 ) {
     val batteryState by batteryViewModel.batteryStateStateFlow.collectAsState()
-    val isRunning by StatsNotificationService.isRunning.collectAsState()
+    val isRunning by StatsLoggingNotificationService.isRunning.collectAsState()
     val appContext = LocalContext.current.applicationContext
 
-    Column {
+    Column(Modifier.verticalScroll(rememberScrollState())) {
         ListItem(parameterName = "battery type", parameterValue = batteryState.technology)
         ListItem(parameterName = "Battery level", parameterValue = "${batteryState.level}%")
         ListItem(parameterName = "Battery voltage", parameterValue = "${batteryState.voltage} V")
@@ -47,5 +49,4 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
             Text(if(isRunning) "Persistence Notification is ON" else "Persistence Notification is OFF")
         }
     }
-
 }

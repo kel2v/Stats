@@ -2,7 +2,7 @@ package com.example.stats.models
 
 import com.example.stats.fakeImplementations.models.FakeBatteryViewModel
 import com.example.stats.fakeImplementations.utils.FakeStatsNotificationServiceController
-import com.example.stats.services.StatsNotificationService
+import com.example.stats.services.StatsLoggingNotificationService
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,17 +12,17 @@ class BatteryViewModelTest {
     fun togglePersistenceNotification_initiallyIsNotRunning_setIsRunningTrue() {
         val fakeBatteryViewModel = FakeBatteryViewModel()
         val fakeStatsNotificationServiceController = FakeStatsNotificationServiceController()
-        StatsNotificationService._isRunning.value = false
+        StatsLoggingNotificationService._isRunning.value = false
         fakeBatteryViewModel.togglePersistenceNotification(fakeStatsNotificationServiceController)
-        assertEquals(StatsNotificationService._isRunning.value, true)
+        assertEquals(StatsLoggingNotificationService._isRunning.value, true)
     }
 
     @Test
     fun togglePersistenceNotification_initiallyIsRunning_setIsRunningFalse() {
         val fakeBatteryViewModel = FakeBatteryViewModel()
         val fakeStatsNotificationServiceController = FakeStatsNotificationServiceController()
-        StatsNotificationService._isRunning.value = true
+        StatsLoggingNotificationService._isRunning.value = true
         fakeBatteryViewModel.togglePersistenceNotification(fakeStatsNotificationServiceController)
-        assertEquals(StatsNotificationService._isRunning.value, false)
+        assertEquals(StatsLoggingNotificationService._isRunning.value, false)
     }
 }

@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Stats">
         <service
-            android:name=".services.StatsNotificationService"
+            android:name=".services.StatsLoggingNotificationService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />

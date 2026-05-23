@@ -1,14 +1,14 @@
 package com.example.stats.fakeImplementations.utils
 
 import com.example.stats.interfaces.StatsNotificationServiceControllerInterface
-import com.example.stats.services.StatsNotificationService
+import com.example.stats.services.StatsLoggingNotificationService
 
 class FakeStatsNotificationServiceController: StatsNotificationServiceControllerInterface {
     override fun startForegroundService() {
-        StatsNotificationService._isRunning.value = true
+        StatsLoggingNotificationService._isRunning.value = true
     }
 
     override fun stopService() {
-        StatsNotificationService._isRunning.value = false
+        StatsLoggingNotificationService._isRunning.value = false
     }
 }

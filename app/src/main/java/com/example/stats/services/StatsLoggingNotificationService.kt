@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StatsNotificationService: Service() {
+class StatsLoggingNotificationService: Service() {
     @Inject lateinit var statsNotificationManager: StatsNotificationManager
     @Inject @ApplicationContext lateinit var appContext: Context
     @Inject lateinit var batteryStateRepository: BatteryStateRepository

@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.stats.services.StatsNotificationService
+import com.example.stats.services.StatsLoggingNotificationService
 import com.example.stats.worker.SyncWorker
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
@@ -33,8 +33,8 @@ class MainActivity: ComponentActivity() {
                 Log.d("DEBUGGING LOGS", "User responded for permission request")
                 if (isGranted) {
                     Log.d("DEBUGGING LOGS", "Permission granted")
-                    if(!StatsNotificationService.isRunning.value) {
-                        val intent = Intent(this, StatsNotificationService::class.java)
+                    if(!StatsLoggingNotificationService.isRunning.value) {
+                        val intent = Intent(this, StatsLoggingNotificationService::class.java)
                         ContextCompat.startForegroundService(this, intent)
                     }
                 } else {
@@ -44,8 +44,8 @@ class MainActivity: ComponentActivity() {
             requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             Log.d("DEBUGGING LOGS", "Old API, no permission request needed")
-            if(!StatsNotificationService.isRunning.value) {
-                val intent = Intent(this, StatsNotificationService::class.java)
+            if(!StatsLoggingNotificationService.isRunning.value) {
+                val intent = Intent(this, StatsLoggingNotificationService::class.java)
                 ContextCompat.startForegroundService(this, intent)
             }
         }
