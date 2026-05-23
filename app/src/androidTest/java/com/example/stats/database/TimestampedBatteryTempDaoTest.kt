@@ -1,28 +1,35 @@
-package com.example.stats.interfaces
+package com.example.stats.database
 
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
+import android.content.Context
+import android.util.Log
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.stats.data.DbFillData
-import com.example.stats.database.TimestampedBatteryTemp
-import com.example.stats.database.TimestampedBatteryTempDao
-import com.example.stats.database.TimestampedBatteryTempDatabase
+import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
 import com.example.stats.utils.TimestampIntervalUtils
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.time.ZoneId
-import kotlin.test.assertEquals
+import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [36])
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
 class TimestampedBatteryTempDaoTest {
-    private lateinit var db: TimestampedBatteryTempDatabase
+    @get:Rule
+    val hiltRule = HiltAndroidRule(this)
+
+    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    @Inject
+    lateinit var batteryTempHistoryRepository: BatteryTempHistoryRepositoryInterface
     private lateinit var dbDao: TimestampedBatteryTempDao
 
     private val dbFillData = DbFillData()
@@ -35,17 +42,16 @@ class TimestampedBatteryTempDaoTest {
 
     @Before
     fun setup() {
-        db = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            TimestampedBatteryTempDatabase::class.java
-        ).build()
+        hiltRule.inject()
+        Log.d("DEBUGGING LOGS", "batteryTempHistoryRepository's class name = ${batteryTempHistoryRepository.className}")
 
-        dbDao = db.timeStampedBatteryTempDao()
+        dbDao = batteryTempHistoryRepository.dbDao
+        runBlocking { dbDao.deleteAll() }
     }
 
     @After
     fun tearDown() {
-        db.close()
+        batteryTempHistoryRepository.closeDB()
     }
 
     fun insertItems(
