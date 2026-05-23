@@ -9,17 +9,17 @@ import kotlinx.coroutines.flow.Flow
 import java.time.ZoneId
 
 @Dao
-interface TimeStampedBatteryTempDao {
-    @Query("SELECT * FROM timeStampedBatteryTemp")
-    fun getAll(): Flow<List<TimeStampedBatteryTemp>>
+interface TimestampedBatteryTempDao {
+    @Query("SELECT * FROM timestampedBatteryTemp")
+    fun getAll(): Flow<List<TimestampedBatteryTemp>>
 
-    @Query("SELECT * FROM timeStampedBatteryTemp WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
-    fun getByTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimeStampedBatteryTemp>>
+    @Query("SELECT * FROM timestampedBatteryTemp WHERE timestamp >= :startTimestamp AND timestamp <= :endTimestamp")
+    fun getByTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimestampedBatteryTemp>>
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insertAll(newInsertList: List<TimeStampedBatteryTemp>)
+    suspend fun insertAll(newInsertList: List<TimestampedBatteryTemp>)
 
-    @Query("DELETE FROM timeStampedBatteryTemp")
+    @Query("DELETE FROM timestampedBatteryTemp")
     suspend fun deleteAll()
 
     fun getAllByDate(
@@ -27,7 +27,7 @@ interface TimeStampedBatteryTempDao {
         month: Int,
         day: Int,
         zoneId: ZoneId
-    ): Flow<List<TimeStampedBatteryTemp>> {
+    ): Flow<List<TimestampedBatteryTemp>> {
         val timestampBasedTimeInterval = TimestampIntervalUtils().convertDayIntoTimestampBasedInterval(year, month, day, zoneId)
         return getByTimestampRange(timestampBasedTimeInterval.startTimestamp, timestampBasedTimeInterval.endTimestamp)
     }

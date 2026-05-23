@@ -3,8 +3,8 @@ package com.example.stats.repository
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
-import com.example.stats.database.TimeStampedBatteryTemp
-import com.example.stats.database.TimeStampedBatteryTempDao
+import com.example.stats.database.TimestampedBatteryTemp
+import com.example.stats.database.TimestampedBatteryTempDao
 import com.example.stats.database.TimestampedBatteryTempDatabase
 import com.example.stats.hilt.ApplicationCoroutineScope
 import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
@@ -26,21 +26,21 @@ class BatteryTempHistoryRepository @Inject constructor(@ApplicationContext priva
         TimestampedBatteryTempDatabase::class.java,
         "timeStampedBatteryTemp"
     ).build()
-    override val dbDao: TimeStampedBatteryTempDao = db.timeStampedBatteryTempDao()
+    override val dbDao: TimestampedBatteryTempDao = db.timeStampedBatteryTempDao()
 
     override fun closeDB() {
         db.close()
     }
 
     private val timestampedBatteryTempFlow = batteryStateRepository.batteryStateFlow.map {
-        TimeStampedBatteryTemp(timestamp = it.timestamp, temperature = it.temperature)
+        TimestampedBatteryTemp(timestamp = it.timestamp, temperature = it.temperature)
     }
 
 
 
 
     private val bufferMutex = Mutex()
-    private val buffer = mutableListOf<TimeStampedBatteryTemp>()
+    private val buffer = mutableListOf<TimestampedBatteryTemp>()
 
     init {
         Log.d("DEBUGGING LOGS", "Launching battery temp logger coroutine ...")
@@ -53,11 +53,11 @@ class BatteryTempHistoryRepository @Inject constructor(@ApplicationContext priva
         }
     }
 
-    override suspend fun getBuffer(): List<TimeStampedBatteryTemp> {
+    override suspend fun getBuffer(): List<TimestampedBatteryTemp> {
         return bufferMutex.withLock { buffer.toList() }
     }
 
-    override suspend fun addItemToBuffer(item: TimeStampedBatteryTemp) {
+    override suspend fun addItemToBuffer(item: TimestampedBatteryTemp) {
         bufferMutex.withLock { buffer.add(item) }
         Log.d("DEBUGGING LOGS", "buffer size after adding $item: ${buffer.size}")
     }

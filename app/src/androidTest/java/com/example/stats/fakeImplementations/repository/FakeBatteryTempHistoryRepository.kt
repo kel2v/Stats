@@ -3,7 +3,7 @@ package com.example.stats.fakeImplementations.repository
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
-import com.example.stats.database.TimeStampedBatteryTemp
+import com.example.stats.database.TimestampedBatteryTemp
 import com.example.stats.database.TimestampedBatteryTempDatabase
 import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,13 +25,13 @@ class FakeBatteryTempHistoryRepository @Inject constructor(@ApplicationContext p
 
 
     private val bufferMutex = Mutex()
-    private val buffer = mutableListOf<TimeStampedBatteryTemp>()
+    private val buffer = mutableListOf<TimestampedBatteryTemp>()
 
-    override suspend fun getBuffer(): List<TimeStampedBatteryTemp> {
+    override suspend fun getBuffer(): List<TimestampedBatteryTemp> {
         return bufferMutex.withLock { buffer.toList() }
     }
 
-    override suspend fun addItemToBuffer(item: TimeStampedBatteryTemp) {
+    override suspend fun addItemToBuffer(item: TimestampedBatteryTemp) {
         bufferMutex.withLock { buffer.add(item) }
     }
 

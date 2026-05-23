@@ -13,7 +13,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.example.stats.data.DbFillData
-import com.example.stats.database.TimeStampedBatteryTemp
+import com.example.stats.database.TimestampedBatteryTemp
 import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -39,12 +39,12 @@ class SyncWorkerTest {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
-    fun getAllDBData(): List<TimeStampedBatteryTemp> {
+    fun getAllDBData(): List<TimestampedBatteryTemp> {
         val allDBData = runBlocking { batteryTempHistoryRepository.dbDao.getAll().first() }
         return allDBData
     }
 
-    fun getBuffer(): List<TimeStampedBatteryTemp> {
+    fun getBuffer(): List<TimestampedBatteryTemp> {
         val buffer = runBlocking{ batteryTempHistoryRepository.getBuffer() }
         return buffer
     }
@@ -60,7 +60,7 @@ class SyncWorkerTest {
         assertEquals(WorkInfo.State.ENQUEUED, workInfo?.state)
     }
 
-    fun assertEqualList(expected: List<TimeStampedBatteryTemp>, actual: List<TimeStampedBatteryTemp>) {
+    fun assertEqualList(expected: List<TimestampedBatteryTemp>, actual: List<TimestampedBatteryTemp>) {
         assertEquals(expected.size, actual.size)
         expected.forEachIndexed { i, item ->
             assertEquals(item.timestamp, actual[i].timestamp)
@@ -81,7 +81,7 @@ class SyncWorkerTest {
 
         runBlocking { batteryTempHistoryRepository.clearBuffer() }
 
-        runBlocking{ batteryTempHistoryRepository.dbDao.insertAll(listOf(TimeStampedBatteryTemp(timestamp = 0L, temperature =  123f))) }
+        runBlocking{ batteryTempHistoryRepository.dbDao.insertAll(listOf(TimestampedBatteryTemp(timestamp = 0L, temperature =  123f))) }
         Log.d("DEBUGGING LOGS", "from SyncWorkerTest: Testing db working. DB size after test insertion: ${getAllDBData().size}")
         runBlocking { batteryTempHistoryRepository.dbDao.deleteAll() }
     }

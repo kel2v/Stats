@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b46e263f07d76696007a24a14c184366",
+    "identityHash": "dc1d115b13cbb194dca8efed73e1efad",
     "entities": [
       {
-        "tableName": "timeStampedBatteryTemp",
+        "tableName": "timestampedBatteryTemp",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER NOT NULL, `temperature` REAL NOT NULL)",
         "fields": [
           {
@@ -35,20 +35,20 @@
         },
         "indices": [
           {
-            "name": "index_timeStampedBatteryTemp_timestamp",
+            "name": "index_timestampedBatteryTemp_timestamp",
             "unique": false,
             "columnNames": [
               "timestamp"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_timeStampedBatteryTemp_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_timestampedBatteryTemp_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b46e263f07d76696007a24a14c184366')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc1d115b13cbb194dca8efed73e1efad')"
     ]
   }
 }

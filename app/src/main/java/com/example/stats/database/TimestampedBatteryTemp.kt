@@ -6,10 +6,10 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "timeStampedBatteryTemp",
+    tableName = "timestampedBatteryTemp",
     indices = [Index(value = ["timestamp"])]
 )
-data class TimeStampedBatteryTemp(
+data class TimestampedBatteryTemp(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "timestamp") val timestamp: Long,
     @ColumnInfo(name = "temperature") val temperature: Float
