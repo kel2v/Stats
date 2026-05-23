@@ -20,7 +20,7 @@ import kotlin.test.assertEquals
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
-class TimeStampedBatteryTempDaoTest {
+class TimestampedBatteryTempDaoTest {
     private lateinit var db: TimestampedBatteryTempDatabase
     private lateinit var dbDao: TimestampedBatteryTempDao
 
