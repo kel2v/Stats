@@ -10,11 +10,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.stats.services.StatsLoggingNotificationService
+import com.example.stats.ui.theme.StatsTheme
 import com.example.stats.worker.SyncWorker
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
@@ -62,7 +67,14 @@ class MainActivity: ComponentActivity() {
         )
 
         setContent {
-            StatsApp()
+            StatsTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    StatsApp()
+                }
+            }
         }
         Log.d("DEBUGGING LOGS", "exiting onCreate")
     }
