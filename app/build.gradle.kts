@@ -8,17 +8,17 @@ plugins {
 }
 
 android {
-    namespace = "com.example.stats"
+    namespace = "com.bytemanager.stats"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.stats"
+        applicationId = "com.bytemanager.stats"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "com.example.stats.fakeImplementations.hilt.HiltTestRunner"
+        testInstrumentationRunner = "com.bytemanager.stats.fakeImplementations.hilt.HiltTestRunner"
     }
 
     buildTypes {
