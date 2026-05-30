@@ -94,4 +94,25 @@ class DbFillData {
         TimestampedBatteryTemp(timestamp = 328796L, temperature = 28.8f),
         TimestampedBatteryTemp(timestamp = 333123L, temperature = 33.0f)
     )
+
+    val conflictingBufferInsertionList = listOf(
+        TimestampedBatteryTemp(timestamp =  0, temperature =  0f),
+        TimestampedBatteryTemp(timestamp =  1, temperature =  1f),
+        TimestampedBatteryTemp(timestamp =  1, temperature =  2f),
+        TimestampedBatteryTemp(timestamp =  2, temperature =  3f),
+        TimestampedBatteryTemp(timestamp =  0, temperature =  4f),
+        TimestampedBatteryTemp(timestamp =  3, temperature =  5f),
+        TimestampedBatteryTemp(timestamp =  4, temperature =  6f),
+        TimestampedBatteryTemp(timestamp =  5, temperature =  7f),
+        TimestampedBatteryTemp(timestamp =  5, temperature =  8f),
+    )
+
+    val expectedNonConflictingList = listOf(
+        TimestampedBatteryTemp(timestamp =  1, temperature =  2f),
+        TimestampedBatteryTemp(timestamp =  2, temperature =  3f),
+        TimestampedBatteryTemp(timestamp =  0, temperature =  4f),
+        TimestampedBatteryTemp(timestamp =  3, temperature =  5f),
+        TimestampedBatteryTemp(timestamp =  4, temperature =  6f),
+        TimestampedBatteryTemp(timestamp =  5, temperature =  8f),
+    )
 }

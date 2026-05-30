@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.work.testing)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.runner)
 
     // hilt
     ksp(libs.hilt.android.compiler)
@@ -99,10 +100,20 @@ dependencies {
     // vico
     implementation(libs.patrykandpatrick.vico.compose)
 
+    // test: Android
+    testImplementation(libs.core.ktx)
+
+    // test: Hilt
+    testImplementation(libs.hilt.android.testing)
+    ksp(libs.hilt.compiler)
+
     // test: Junit
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
     testImplementation(libs.junit.jupiter)
+
+    // test: Kotlin-coroutines
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // test: robolectric
     testImplementation(libs.robolectric)

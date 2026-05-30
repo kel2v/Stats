@@ -18,7 +18,6 @@ import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -45,7 +44,7 @@ class SyncWorkerTest {
     }
 
     fun getBuffer(): List<TimestampedBatteryTemp> {
-        val buffer = runBlocking{ batteryTempHistoryRepository.getBuffer() }
+        val buffer = runBlocking{ batteryTempHistoryRepository.buffer.getBuffer() }
         return buffer
     }
 
@@ -79,7 +78,7 @@ class SyncWorkerTest {
             .build()
         WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
 
-        runBlocking { batteryTempHistoryRepository.clearBuffer() }
+        runBlocking { batteryTempHistoryRepository.buffer.clearBuffer() }
 
         runBlocking{ batteryTempHistoryRepository.dbDao.insertAll(listOf(TimestampedBatteryTemp(timestamp = 0L, temperature =  123f))) }
         Log.d("DEBUGGING LOGS", "from SyncWorkerTest: Testing db working. DB size after test insertion: ${getAllDBData().size}")
@@ -96,7 +95,7 @@ class SyncWorkerTest {
         val tempDataSource = DbFillData()
         runBlocking {
             tempDataSource.jan1st1970List.forEach {
-                batteryTempHistoryRepository.addItemToBuffer(it)
+                batteryTempHistoryRepository.buffer.addItemToBuffer(it)
             }
         }
         assertEquals(tempDataSource.jan1st1970List.size, getBuffer().size)
@@ -126,7 +125,7 @@ class SyncWorkerTest {
         val tempDataSource = DbFillData()
         runBlocking {
             tempDataSource.jan1st1970List.forEach {
-                batteryTempHistoryRepository.addItemToBuffer(it)
+                batteryTempHistoryRepository.buffer.addItemToBuffer(it)
             }
         }
         assertEquals(tempDataSource.jan1st1970List.size, getBuffer().size)
@@ -155,7 +154,7 @@ class SyncWorkerTest {
         val tempDataSource = DbFillData()
         runBlocking {
             tempDataSource.jan1st1970List.forEach {
-                batteryTempHistoryRepository.addItemToBuffer(it)
+                batteryTempHistoryRepository.buffer.addItemToBuffer(it)
             }
         }
 
@@ -177,7 +176,7 @@ class SyncWorkerTest {
 
         runBlocking {
             tempDataSource.jan2nd1970List.forEach {
-                batteryTempHistoryRepository.addItemToBuffer(it)
+                batteryTempHistoryRepository.buffer.addItemToBuffer(it)
             }
         }
 

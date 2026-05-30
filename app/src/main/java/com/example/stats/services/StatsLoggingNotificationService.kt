@@ -1,59 +1,72 @@
 package com.example.stats.services
 
-import android.app.Notification
-import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
+import com.example.stats.interfaces.BatteryTempHistoryRepositoryInterface
+import com.example.stats.notification.StatsLogger
 import com.example.stats.notification.StatsNotificationManager
 import com.example.stats.repository.BatteryStateRepository
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class StatsLoggingNotificationService: Service() {
-    @Inject lateinit var statsNotificationManager: StatsNotificationManager
-    @Inject @ApplicationContext lateinit var appContext: Context
-    @Inject lateinit var batteryStateRepository: BatteryStateRepository
-    private lateinit var scope: CoroutineScope
-
     companion object {
-        var _isRunning = MutableStateFlow(false)
+        private var _isRunning = MutableStateFlow(false)
         val isRunning = _isRunning.asStateFlow()
     }
 
+
+    @Inject lateinit var batteryStateRepository: BatteryStateRepository
+    @Inject lateinit var batteryTempHistoryRepository: BatteryTempHistoryRepositoryInterface
+    @Inject lateinit var statsLogger: StatsLogger
+    private var scope  = CoroutineScope(SupervisorJob() + Dispatchers.Default) // there's no chance of accessing scope after scope.cancel() in onDestroy() as OS destroy instance on onDestroy is called
+    private var job: Job? = null
+
+
     override fun onBind(intent: Intent?): IBinder? = null
 
+    override fun onCreate() {
+        super.onCreate()
+        _isRunning.value = true
+        Log.d("DEBUGGING LOGS", "Service onCreate called")
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent == null) {
+            Log.d("DEBUGGING LOGS", "Restarted by OS with null intent, stopping.")
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         Log.d("DEBUGGING LOGS", "Running onStartCommand")
 
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-        statsNotificationManager.createStatsNotificationChannel()
-        _isRunning.value = true
-        startForeground(1, statsNotificationManager.buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value))
-
-        scope.launch {
-            while(isActive) {
-                batteryStateRepository.batteryStateFlow.collect {value ->
-                    val notificationManager = appContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    val notification = statsNotificationManager.buildStatsNotification(value)
-                    notificationManager.notify(1, notification)
-                    Log.d("DEBUGGING LOGS", "${notification.extras.getString(Notification.EXTRA_TITLE, "NA")}\n${notification.extras.getString(Notification.EXTRA_TEXT, "NA")}")
+        if(job?.isActive == true) {
+            Log.d("DEBUGGING LOGS", "StatLogger job is already running, skipping ...")
+        } else {
+            job = scope.launch {
+                try {
+                    statsLogger.startStatsLogger(::startForeground)
+                } catch (e: Exception) {
+                    Log.d("DEBUGGING LOGS", "Exception occurred: $e")
+                } finally {
+                    stopSelf(startId)
                 }
             }
+
+            Log.d("DEBUGGING LOGS", "No active StatLogger job found, starting StatLogger job.")
         }
+
 
         Log.d("DEBUGGING LOGS", "Exiting onStartCommand")
         return START_STICKY
@@ -62,6 +75,7 @@ class StatsLoggingNotificationService: Service() {
     override fun onDestroy() {
         Log.d("DEBUGGING LOGS", "Running StatsNotificationService.onDestroy")
         scope.cancel()
+        StatsNotificationManager.closeStatsNotificationChannel(applicationContext)
         stopForeground(STOP_FOREGROUND_REMOVE)
         _isRunning.value = false
         super.onDestroy()

@@ -8,6 +8,7 @@ import android.os.BatteryManager
 import android.util.Log
 import com.example.stats.R
 import com.example.stats.data_structure.BatteryState
+import com.example.stats.hilt.ApplicationCoroutineScope
 import com.example.stats.utils.BatteryStateRepositoryUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +25,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BatteryStateRepository @Inject constructor(@ApplicationContext private val appContext: Context) {
+class BatteryStateRepository @Inject constructor(
+    @ApplicationContext private val appContext: Context,
+    @ApplicationCoroutineScope private val scope: CoroutineScope
+) {
     val batteryStateFlow = callbackFlow {
         Log.d("DEBUGGING LOGS", "callbackFlow is started executing")
 
@@ -73,14 +77,22 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         )
 
+        Log.d("DEBUGGING LOGS", "Registered BroadcastReceiver.")
+
         awaitClose {
             appContext.unregisterReceiver(receiver)
+            Log.d("DEBUGGING LOGS", "Unregistered BroadcastReceiver.")
         }
     }
 
-    val batteryStateStateFlow = batteryStateFlow.stateIn(
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-        started = SharingStarted.Eagerly,
+    val batteryStateSharedFlow = batteryStateFlow.shareIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000)
+    )
+
+    val batteryStateStateFlow = batteryStateSharedFlow.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
         initialValue = BatteryState(
             timestamp = 0,
             level = Int.MIN_VALUE,
@@ -90,11 +102,5 @@ class BatteryStateRepository @Inject constructor(@ApplicationContext private val
             technology = appContext.getString(R.string.not_available),
             health = appContext.getString(R.string.not_available)
         )
-    )
-
-    val batteryStateSharedFlow = batteryStateFlow.shareIn(
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-        started = SharingStarted.Eagerly,
-        replay = 0
     )
 }

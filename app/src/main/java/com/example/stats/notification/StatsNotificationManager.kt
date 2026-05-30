@@ -1,51 +1,47 @@
 package com.example.stats.notification
 
+import android.Manifest
 import android.app.Notification
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.example.stats.MainActivity
 import com.example.stats.R
 import com.example.stats.data_structure.BatteryState
-import com.example.stats.repository.BatteryStateRepository
+import com.example.stats.services.StatsLoggingNotificationService
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class StatsNotificationManager @Inject constructor(@ApplicationContext private val appContext: Context, private val batteryStateRepository: BatteryStateRepository, private val channel: StatsNotificationChannel) {
-    private lateinit var callbackCoroutine: Job
+object StatsNotificationManager {
+    var notificationPermissionGranted = false
 
-    fun createStatsNotificationChannel() {
+    fun createStatsNotificationChannel(appContext: Context) {
         Log.d("DEBUGGING LOGS", "Creating notification channel")
 
-        channel.init(
-            _channelId = "Stats",
-            _channelName = "Battery info",
-            _importance = NotificationManager.IMPORTANCE_DEFAULT,
-            _channelDescription = "battery temperature, battery level and battery voltage"
-        )
-        channel.createChannel()
-    }
-
-    fun startStatsNotificationBroadcast() {
-        Log.d("DEBUGGING LOGS", "Starting notification broadcast")
-        callbackCoroutine = CoroutineScope(SupervisorJob() + Dispatchers.Default).launch {
-            while(true) {
-                showStatsLocalNotification()
-                delay(1000)
-            }
+        val channel = NotificationChannel("Stats", "Battery info", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = "battery temperature, battery level and battery voltage"
         }
+
+        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
-    fun buildStatsNotification(batteryState: BatteryState): Notification {
+    fun closeStatsNotificationChannel(appContext: Context) {
+        Log.d("DEBUGGING LOGS", "Closing notification channel")
+
+        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.deleteNotificationChannel("Stats")
+    }
+
+    fun buildStatsNotification(appContext: Context, batteryState: BatteryState): Notification {
         val channelId = "Stats"
         val intent = Intent(appContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -66,17 +62,5 @@ class StatsNotificationManager @Inject constructor(@ApplicationContext private v
             .build()
 
         return notification
-    }
-
-    private fun showStatsLocalNotification() {
-        Log.d("DEBUGGING LOGS", "posting new notification ...")
-
-        val notification = buildStatsNotification(batteryStateRepository.batteryStateStateFlow.value)
-        channel.postNotification(notification, 1001)
-    }
-
-    fun destroyStatsNotificationBroadcast() {
-        Log.d("DEBUGGING LOGS", "Destroying notification broadcast")
-        callbackCoroutine.cancel()
     }
 }

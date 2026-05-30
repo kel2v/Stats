@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -29,10 +30,13 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
 })
 ) {
     val batteryState by batteryViewModel.batteryStateStateFlow.collectAsState()
-    val isRunning by StatsLoggingNotificationService.isRunning.collectAsState()
+    val isLoggingEnabled by BatteryViewModel.isLoggingEnabled
     val appContext = LocalContext.current.applicationContext
 
-    Column(Modifier.verticalScroll(rememberScrollState())) {
+    Column(
+        Modifier.verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         ListItem(parameterName = "battery type", parameterValue = batteryState.technology)
         ListItem(parameterName = "Battery level", parameterValue = "${batteryState.level}%")
         ListItem(parameterName = "Battery voltage", parameterValue = "${batteryState.voltage} V")
@@ -43,10 +47,10 @@ fun Battery(batteryViewModel: BatteryViewModel = hiltViewModel(checkNotNull(Loca
         Spacer(Modifier.height(40.dp))
 
         Button(
-            onClick = { batteryViewModel.togglePersistenceNotification(StatsNotificationServiceController(appContext)) },
-            modifier = Modifier.height(60.dp).fillMaxWidth()
+            onClick = { BatteryViewModel.toggleLogging(StatsNotificationServiceController(appContext)) },
+            modifier = Modifier.height(60.dp).fillMaxWidth(0.8f)
         ) {
-            Text(if(isRunning) "Persistence Notification is ON" else "Persistence Notification is OFF")
+            Text(if(isLoggingEnabled) "Logging is ON" else "Logging is OFF")
         }
     }
 }
