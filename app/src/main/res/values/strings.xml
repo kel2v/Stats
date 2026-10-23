@@ -1,0 +1,106 @@
+<resources>
+    <string name="app_name">Stats</string>
+    <string name="nav_back_icon">Navigate back to previous page</string>
+    <string name="premium_icon">Upgrade to Premium</string>
+    <string name="menu_icon">Menu</string>
+    <string name="battery_button">Battery</string>
+    <string name="network_button">Network</string>
+    <string name="dashboard_button">Dashboard</string>
+    <string name="settings_option">Settings</string>
+    <string name="privacy_policy_option">Privacy Policy</string>
+    <string name="licenses_option">Licenses</string>
+    <string name="dashboard_page_title">Dashboard</string>
+    <string name="battery_dashboard_title">Battery Dashboard</string>
+    <string name="network_page_title">Network</string>
+    <string name="premium_page_title">Premium</string>
+    <string name="settings_page_title">Settings</string>
+    <string name="privacy_policy_page_title">Privacy Policy</string>
+    <string name="licenses_page_title">Licenses</string>
+
+    <string name="battery_health_cold">Cold</string>
+    <string name="battery_health_dead">Dead</string>
+    <string name="battery_health_good">Good</string>
+    <string name="battery_health_overheat">Overheated</string>
+    <string name="battery_health_over_voltage">Overvoltage</string>
+    <string name="battery_health_unspecified_failure">Failed</string>
+    <string name="battery_health_unknown">Unknown</string>
+
+    <string name="battery_status_full">Full</string>
+    <string name="battery_status_charging">Charging</string>
+    <string name="battery_status_discharging">Discharging</string>
+    <string name="battery_status_not_charging">Not charging</string>
+    <string name="battery_status_unknown">Unknown</string>
+    <string name="not_available">Not available</string>
+    <string name="selected_graph">Selected graph</string>
+    <string name="live_graph">Live graph</string>
+    <string name="day_graph">Day graph</string>
+    <string name="week_graph">Week graph</string>
+    <string name="month_graph">Month graph</string>
+    <string name="year_graph">Year graph</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="date_selected">Date selected</string>
+    <string name="select_date">Select date</string>
+    <string name="no_data_found">No data found</string>
+    <string name="select_graph_type">Select graph type</string>
+    <string name="battery_graphs_page_title">Battery Graphs</string>
+
+    <string name="battery_type_label">Battery type</string>
+    <string name="battery_health_label">Battery health</string>
+    <string name="charging_status_label">Charging status</string>
+    <string name="battery_level_label">Battery level</string>
+    <string name="battery_voltage_label">Battery voltage</string>
+    <string name="battery_temperature_label">Battery temperature</string>
+
+    <string name="battery_graphs_button">Battery graphs</string>
+
+    <string name="battery_level_graph_label">Battery level</string>
+    <string name="battery_temperature_graph_label">Battery temperature</string>
+    <string name="battery_voltage_graph_label">Battery voltage</string>
+
+    <string name="today">Today</string>
+    <string name="prev">Prev</string>
+    <string name="next">Next</string>
+
+    <string name="export">Export</string>
+    <string name="export_all_data_label">Export all data</string>
+    <string name="export_from_date_range_label">Export from a date range</string>
+
+    <string name="import_label">Import</string>
+    <string name="merge_into_existing_database_label">Merge into existing database</string>
+    <string name="replace_existing_database_label">Replace existing database</string>
+
+    <string name="reset_button">Reset</string>
+    <string name="warning">Warning</string>
+    <string name="warning_message">"Clicking 'Confirm' would delete all the historical battery-related logged data, including battery temperature, battery voltage, battery levels, etc.
+
+To avoid accidental data loss, all the data will be exported to a file that you can access in your internal storage's 'Downloads' folder.
+
+Press 'Confirm' to continue resetting the database."
+    </string>
+
+
+    <string name="data_logging_and_notification_preference_group">Data logging and notification</string>
+    <string name="database_management_preference_group">Database management</string>
+    <string name="units_preference_group">Units</string>
+    <string name="graphs_preference_group">Graphs</string>
+
+    <string name="data_logging_preference">Data logging</string>
+    <string name="notification_preference">Notification</string>
+    <string name="show_temperature_in_fahrenheits_preference">Show temperature in Fahrenheits</string>
+    <string name="moving_average_preference">Moving average</string>
+    <string name="catmull_rom_curve_preference">Catmull-Rom curve</string>
+
+    <string name="moving_average_preference_description">"Performs moving average transformation on graph's y-axis data to reduce abrupt changes in value"</string>
+    <string name="catmull_rom_curve_preference_description">"Transforms sharp-edges of the graph into curvy lines"</string>
+
+
+
+
+
+
+
+
+
+
+</resources>

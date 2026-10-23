@@ -1,0 +1,61 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "2471e519b413c4dc1df04076b5892d20",
+    "entities": [
+      {
+        "tableName": "timestampedBatteryStates",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `level` INTEGER, `scale` INTEGER, `voltage` INTEGER, `temperature` INTEGER, `chargingStatus` INTEGER, `batteryHealth` INTEGER, PRIMARY KEY(`timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "level",
+            "columnName": "level",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "scale",
+            "columnName": "scale",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "voltage",
+            "columnName": "voltage",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "temperature",
+            "columnName": "temperature",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "chargingStatus",
+            "columnName": "chargingStatus",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "batteryHealth",
+            "columnName": "batteryHealth",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "timestamp"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2471e519b413c4dc1df04076b5892d20')"
+    ]
+  }
+}
