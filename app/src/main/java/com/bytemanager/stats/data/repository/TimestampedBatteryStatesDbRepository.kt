@@ -19,7 +19,7 @@ class TimestampedBatteryStatesDbRepository @Inject constructor(
     @ApplicationContext private val appContext: Context
 ) {
     private val db = Room.databaseBuilder(
-        appContext,
+        appContext.createDeviceProtectedStorageContext(),
         TimestampedBatteryStatesDatabase::class.java,
         "com_bytemanager_stats.db"
     ).build()

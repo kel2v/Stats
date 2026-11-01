@@ -16,13 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bytemanager.stats.R
 import com.bytemanager.stats.data.types.GraphType
 import com.bytemanager.stats.ui.pages.GraphData
-import com.bytemanager.stats.ui.theme.AppTypography
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.VicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.VicoZoomState
@@ -100,7 +98,7 @@ fun DayWiseLineGraph(
     ) {
         Text(
             text = graphName,
-            style = AppTypography.titleMedium
+            style = MaterialTheme.typography.titleMedium
         )
 
         Spacer(Modifier.height(2.dp))
@@ -113,7 +111,7 @@ fun DayWiseLineGraph(
         ) {
             Text(
                 text = stringResource(R.string.no_data_found),
-                style = AppTypography.bodySmall
+                style = MaterialTheme.typography.bodySmall
             )
 
             return

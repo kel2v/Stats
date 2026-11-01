@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -29,7 +30,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bytemanager.stats.R
 import com.bytemanager.stats.data.types.GraphType
 import com.bytemanager.stats.ui.graphs.DayWiseLineGraph
-import com.bytemanager.stats.ui.theme.AppTypography
 import com.bytemanager.stats.utils.StatsTimeUtils
 import java.time.LocalDate
 
@@ -159,7 +159,7 @@ private fun DateSelectorMenu(
                     ) {
                         Text(
                             text = stringResource(R.string.confirm),
-                            style = AppTypography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     }
                 },
@@ -169,7 +169,7 @@ private fun DateSelectorMenu(
                     ) {
                         Text(
                             text = stringResource(R.string.dismiss),
-                            style = AppTypography.labelMedium
+                            style = MaterialTheme.typography.labelMedium,
                         )
                     }
                 },
@@ -195,7 +195,7 @@ private fun SelectedDateLabel(
     ) {
         Text(
             text = "${stringResource(R.string.date_selected)}: $date" + if(date == today) " (${stringResource(R.string.today)})" else "",
-            style = AppTypography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
 
         Spacer(Modifier.height(2.dp))
@@ -210,7 +210,7 @@ private fun SelectedDateLabel(
             ) {
                 Text(
                     text = stringResource(R.string.prev),
-                    style = AppTypography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
 
@@ -219,7 +219,7 @@ private fun SelectedDateLabel(
             ) {
                 Text(
                     text = stringResource(R.string.select_date),
-                    style = AppTypography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
 
@@ -229,7 +229,7 @@ private fun SelectedDateLabel(
             ) {
                 Text(
                     text = stringResource(R.string.next),
-                    style = AppTypography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         }

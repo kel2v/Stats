@@ -25,8 +25,9 @@ android {
         applicationId = "com.bytemanager.stats"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+
+        versionCode = 3
+        versionName = "1.1.0"
     }
 
     signingConfigs {
@@ -53,6 +54,10 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 
@@ -93,14 +98,9 @@ room {
 }
 
 dependencies {
-    // composeBom
+
+    // androidx.compose.bom
     implementation(platform(libs.androidx.compose.bom))
-
-    // core
-    implementation(libs.core.ktx)
-
-    // androidx
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material3)
@@ -108,47 +108,49 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
+
+    // other androidx dependencies
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)
+    /*       */ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.junit.ktx)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.work.testing)
-    implementation(libs.androidx.hilt.work)
-    implementation(libs.androidx.runner)
-
-    // hilt
-    ksp(libs.hilt.android.compiler)
-    implementation(libs.hilt.android)
-    ksp(libs.androidx.hilt.compiler)
-
-
-    // room
-    ksp(libs.androidx.room.compiler)
+    /*       */ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.runtime)
 
-    // vico
+
+    // google.dagger.hilt
+    implementation(libs.google.dagger.hilt.android)
+    /*       */ksp(libs.google.dagger.hilt.android.compiler)
+    /*       */ksp(libs.google.dagger.hilt.compiler)
+
+    // patrykandpatrick.vico
     implementation(libs.patrykandpatrick.vico.compose)
 
-    // test: Android
-    testImplementation(libs.core.ktx)
 
-    // test: Hilt
-    testImplementation(libs.hilt.android.testing)
-    ksp(libs.hilt.compiler)
+
+
+
+
+
+
+    // =================== test ====================
+
+    // androidx
+    testImplementation(libs.androidx.test.core.ktx)
 
     // test: Junit
     testImplementation(libs.junit)
     testImplementation(libs.junit.vintage.engine)
     testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.platform.launcher)
+    /*
+    **/testRuntimeOnly(libs.junit.platform.launcher)
 
-    // test: Kotlin-coroutines
-    testImplementation(libs.kotlinx.coroutines.test)
+    // test: jetbrains
+    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
 
     // test: robolectric
     testImplementation(libs.robolectric)
@@ -156,13 +158,28 @@ dependencies {
     // test: kotlin
     testImplementation(kotlin("test"))
 
+
+
+
+
+
+    // ================ androidTest =====================
+
+    // androidx
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.work.testing)
+    androidTestImplementation(libs.androidx.test.core.ktx)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.junit.ktx)
+    androidTestImplementation(libs.androidx.test.runner)
+
     androidTestImplementation(libs.hilt.android.testing)
-    kspAndroidTest(libs.hilt.android.compiler)
+
+
+
+
+    // ============ Debug ====================
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,7 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +31,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bytemanager.stats.R
-import com.bytemanager.stats.ui.theme.AppTypography
 import com.bytemanager.stats.ui.theme.StatsTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResetForm(
     resetFormViewModel: ResetFormViewModel = hiltViewModel()
@@ -38,16 +42,19 @@ fun ResetForm(
 
     val isResetButtonClickedIn = uiState.isResetButtonClickedIn
 
-    Column {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Button(
             enabled = !isResetButtonClickedIn,
             onClick = {
                 resetFormViewModel.clickResetButton()
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.reset_button),
-                style = AppTypography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
             )
         }
 
@@ -58,14 +65,14 @@ fun ResetForm(
                 },
                 properties = DialogProperties(
                     dismissOnBackPress = true,
-                    dismissOnClickOutside = false,
+                    dismissOnClickOutside = true,
                 )
             ) {
                 StatsTheme {
                     Box(
                         modifier = Modifier
-                            .width(350.dp)
-                            .height(300.dp)
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.4f)
                             .background(
                                 color = MaterialTheme.colorScheme.inverseOnSurface,
                                 shape = RoundedCornerShape(15.dp)
@@ -74,48 +81,52 @@ fun ResetForm(
                         Column (
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
-                                .padding(10.dp)
+                                .padding(20.dp)
                                 .verticalScroll(
                                     state = rememberScrollState(),
-                                )
+                                ).fillMaxWidth()
                         ) {
                             Text(
                                 text = stringResource(R.string.warning),
-                                style = AppTypography.titleLarge
+                                style = MaterialTheme.typography.titleLarge,
                             )
 
                             Spacer(Modifier.height(20.dp))
 
                             Text(
                                 text = stringResource(R.string.warning_message),
-                                style = AppTypography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
 
                             Spacer(Modifier.height(30.dp))
 
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier.fillMaxWidth(0.8f)
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Button(
                                     onClick = {
                                         resetFormViewModel.onClickingDialogDismissButton()
-                                    }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(0.7f)
                                 ) {
                                     Text(
                                         text = stringResource(R.string.dismiss),
-                                        style = AppTypography.labelLarge
+                                        style = MaterialTheme.typography.labelLarge,
                                     )
                                 }
+
+                                Spacer(Modifier.height(10.dp))
 
                                 Button(
                                     onClick = {
                                         resetFormViewModel.onClickingDialogConfirmButton()
-                                    }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(0.7f)
                                 ) {
                                     Text(
                                         text = stringResource(R.string.confirm),
-                                        style = AppTypography.labelLarge
+                                        style = MaterialTheme.typography.labelLarge,
                                     )
                                 }
                             }

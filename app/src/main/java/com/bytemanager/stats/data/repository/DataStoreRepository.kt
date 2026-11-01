@@ -2,19 +2,22 @@ package com.bytemanager.stats.data.repository
 
 import android.content.Context
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.bytemanager.stats.ApplicationCoroutineScope
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,29 +26,33 @@ class DataStoreRepository @Inject constructor(
     @ApplicationContext private val appContext: Context,
     @ApplicationCoroutineScope private val appCoroutineScope: CoroutineScope
 ) {
-    private val Context.dataStore by preferencesDataStore(name = "app_settings")
+    private val dataStore = DeviceContextDataStoreProvider.get(appContext)
 
     object Keys {
-        val IS_NOTIFICATION_PERMISSION_OBTAINED = booleanPreferencesKey("is_notification_permission_obtained")
         val IS_DATA_LOGGING_ENABLED = booleanPreferencesKey("is_data_logging_enabled")
-        val IS_DATA_LOGGING_TASK_RUNNING = booleanPreferencesKey("is_data_logging_task_running")
-        val IS_NOTIFICATION_ENABLED = booleanPreferencesKey("is_notification_enabled")
-        val ERROR_LOG_FILE_URI = stringPreferencesKey("error_log_file_uri")
+        val IS_NOTIFICATIONS_ENABLED = booleanPreferencesKey("is_notifications_enabled")
         val IS_FAHRENHEIT = booleanPreferencesKey("is_fahrenheit")
         val IS_MOVING_AVERAGE_FOR_VOLTAGE_GRAPH_ENABLED = booleanPreferencesKey("is_moving_average_for_voltage_graph_enabled")
-        val IS_CUTMULL_ROM_CURVE_ENABLED = booleanPreferencesKey(("is_cutmull_rom_curve_enabled"))
+        val IS_CUTMULL_ROM_CURVE_ENABLED = booleanPreferencesKey("is_cutmull_rom_curve_enabled")
+        val IS_IGNORING_BATTERY_OPTIMIZATIONS = booleanPreferencesKey("is_ignoring_battery_optimizations")
+        val IS_AUTOSTART_LOGGING_SERVICE_ENABLED = booleanPreferencesKey("is_autostart_logging_service_enabled")
     }
 
-    val stateFlowOfSettings: StateFlow<Settings> = appContext.dataStore.data.map { preferences ->
-        Log.d("DataStoreRepository", "emitted new Settings value")
-        Settings(
+    val stateFlowOfSettings: StateFlow<Settings> = dataStore.data.map { preferences ->
+        val e = Settings(
             isDataLoggingEnabled = preferences[Keys.IS_DATA_LOGGING_ENABLED] ?: false,
-            isNotificationPermissionObtained = preferences[Keys.IS_NOTIFICATION_PERMISSION_OBTAINED] ?: false,
-            isNotificationEnabled = preferences[Keys.IS_NOTIFICATION_ENABLED] ?: false,
+            isNotificationsEnabled = preferences[Keys.IS_NOTIFICATIONS_ENABLED] ?: false,
             isFahrenheit = preferences[Keys.IS_FAHRENHEIT] ?: false,
             isMovingAverageForVoltageGraphEnabled = preferences[Keys.IS_MOVING_AVERAGE_FOR_VOLTAGE_GRAPH_ENABLED] ?: true,
             isCutmullRomCurveEnabled = preferences[Keys.IS_CUTMULL_ROM_CURVE_ENABLED] ?: true,
+            isIgnoringBatteryOptimizations = preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] ?: false,
+            isAutostartLoggingServiceEnabled = preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false
         )
+
+        Log.d("DataStoreRepository", "emitted new Settings value: $e")
+
+        e
+
     }.stateIn(
             scope = appCoroutineScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -53,17 +60,23 @@ class DataStoreRepository @Inject constructor(
     )
 
     suspend fun isDataLoggingEnabled(): Boolean {
-        return appContext.dataStore.data.map {
+        return dataStore.data.map {
             it[Keys.IS_DATA_LOGGING_ENABLED] ?: false
         }.first()
     }
 
+    suspend fun setDataLogging(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[Keys.IS_DATA_LOGGING_ENABLED] = value
+        }
+    }
+
     suspend fun toggleDataLogging() {
-        val currentValue = appContext.dataStore.data.map { preferences ->
+        val currentValue = dataStore.data.map { preferences ->
             preferences[Keys.IS_DATA_LOGGING_ENABLED] ?: false
         }.first()
 
-        appContext.dataStore.edit { current ->
+        dataStore.edit { current ->
             current[Keys.IS_DATA_LOGGING_ENABLED] = !currentValue
         }
     }
@@ -72,59 +85,26 @@ class DataStoreRepository @Inject constructor(
 
 
 
-    suspend fun isNotificationPermissionObtained(): Boolean {
-        return appContext.dataStore.data.map { preferences ->
-            preferences[Keys.IS_NOTIFICATION_PERMISSION_OBTAINED] ?: false
+    suspend fun isNotificationsEnabled(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[Keys.IS_NOTIFICATIONS_ENABLED] ?: false
         }.first()
     }
 
-    suspend fun setNotificationPermissionObtained() {
-        appContext.dataStore.edit { current ->
-            current[Keys.IS_NOTIFICATION_PERMISSION_OBTAINED] = true
+    suspend fun setIsNotificationsEnabled(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[Keys.IS_NOTIFICATIONS_ENABLED] = value
         }
-    }
-
-    suspend fun setNotificationPermissionNotObtained() {
-        appContext.dataStore.edit { current ->
-            current[Keys.IS_NOTIFICATION_PERMISSION_OBTAINED] = false
-        }
-    }
-
-
-
-
-    suspend fun isNotificationEnabled(): Boolean {
-        return appContext.dataStore.data.map { preferences ->
-            preferences[Keys.IS_NOTIFICATION_ENABLED] ?: false
-        }.first()
     }
 
     suspend fun toggleNotificationEnabled() {
-        val currentValue = appContext.dataStore.data.map { preferences ->
-            preferences[Keys.IS_NOTIFICATION_ENABLED] ?: false
+        val currentValue = dataStore.data.map { preferences ->
+            preferences[Keys.IS_NOTIFICATIONS_ENABLED] ?: false
         }.first()
 
-        appContext.dataStore.edit { current ->
-            current[Keys.IS_NOTIFICATION_ENABLED] = !currentValue
+        dataStore.edit { current ->
+            current[Keys.IS_NOTIFICATIONS_ENABLED] = !currentValue
         }
-    }
-
-
-
-
-
-    suspend fun setErrorLogFileUri(uri: String) {
-        appContext.dataStore.edit { preferences ->
-            preferences[Keys.ERROR_LOG_FILE_URI] = uri
-        }
-    }
-
-    fun getErrorLogFileUri(): Flow<String?> {
-        val result = appContext.dataStore.data.map { preferences ->
-            preferences[Keys.ERROR_LOG_FILE_URI]
-        }
-
-        return result
     }
 
 
@@ -132,11 +112,11 @@ class DataStoreRepository @Inject constructor(
 
 
     suspend fun toggleFahrenheitChoice() {
-        val currentValue = appContext.dataStore.data.map { preferences ->
+        val currentValue = dataStore.data.map { preferences ->
             preferences[Keys.IS_FAHRENHEIT] ?: false
         }.first()
 
-        appContext.dataStore.edit { current ->
+        dataStore.edit { current ->
             current[Keys.IS_FAHRENHEIT] = !currentValue
         }
     }
@@ -144,49 +124,82 @@ class DataStoreRepository @Inject constructor(
 
 
 
-    suspend fun setIsDataLoggingServiceRunning(value: Boolean) {
-        appContext.dataStore.edit { preferences ->
-            preferences[Keys.IS_DATA_LOGGING_TASK_RUNNING] = value
-        }
-    }
-
-    suspend fun getIsDataLoggingServiceRunning(): Boolean? {
-        return appContext.dataStore.data.map { preferences ->
-            preferences[Keys.IS_DATA_LOGGING_TASK_RUNNING]
-        }.first()
-    }
-
-
-
-
 
     suspend fun toggleIsMovingAverageForVoltageGraphEnabledChoice() {
-        val currentValue = appContext.dataStore.data.map { preferences ->
+        val currentValue = dataStore.data.map { preferences ->
             preferences[Keys.IS_MOVING_AVERAGE_FOR_VOLTAGE_GRAPH_ENABLED] ?: true
         }.first()
 
-        appContext.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[Keys.IS_MOVING_AVERAGE_FOR_VOLTAGE_GRAPH_ENABLED] = !currentValue
         }
     }
 
     suspend fun toggleIsCutmullRomCurveEnabled() {
-        val currentValue = appContext.dataStore.data.map { preferences ->
+        val currentValue = dataStore.data.map { preferences ->
             preferences[Keys.IS_CUTMULL_ROM_CURVE_ENABLED] ?: true
         }.first()
 
-        appContext.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[Keys.IS_CUTMULL_ROM_CURVE_ENABLED] = !currentValue
+        }
+    }
+
+    suspend fun isIgnoringBatteryOptimizations(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] ?: false
+        }.first()
+    }
+
+    suspend fun setIsIgnoringBatteryOptimizations(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] = value
+        }
+    }
+
+    suspend fun isAutostartLoggingServiceChoice(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false
+        }.first()
+    }
+
+    suspend fun toggleIsAutostartLoggingServiceChoice() {
+        val initialValue = isAutostartLoggingServiceChoice()
+
+        dataStore.edit { preferences ->
+            preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] = !initialValue
         }
     }
 }
 
 data class Settings(
     val isDataLoggingEnabled: Boolean = false,
-    val isNotificationPermissionObtained: Boolean = false,
-    val isNotificationEnabled: Boolean = false,
+    val isNotificationsEnabled: Boolean = false,
     val isFahrenheit: Boolean = false,
-    val isDataLoggingTaskRunning: Boolean = false,
     val isMovingAverageForVoltageGraphEnabled: Boolean = true,
     val isCutmullRomCurveEnabled: Boolean = true,
+    val isIgnoringBatteryOptimizations: Boolean = false,
+    val isAutostartLoggingServiceEnabled: Boolean = false,
 )
+
+object DeviceContextDataStoreProvider {
+    @Volatile
+    private var instance: DataStore<Preferences>? = null
+
+    fun get(context: Context): DataStore<Preferences> {
+        return instance ?: synchronized(this) {
+            instance ?: buildDataStore(context.applicationContext).also { instance = it }
+        }
+    }
+
+    private fun buildDataStore(context: Context): DataStore<Preferences> {
+        Log.d("UnifiedDataStoreProvider", "building DataStore")
+        return PreferenceDataStoreFactory.create(
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            produceFile = {
+                val deviceContext = context.applicationContext.createDeviceProtectedStorageContext()
+                File(deviceContext.filesDir, "datastore/direct_boot_prefs.preferences_pb")
+            }
+        )
+    }
+}

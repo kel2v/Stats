@@ -243,7 +243,7 @@ fun StatsTheme(
 
     MaterialTheme(
         colorScheme = if(darkTheme) darkScheme else lightScheme,
-        typography = AppTypography,
+        typography = TypographyNormal,
         content = content
     )
 }

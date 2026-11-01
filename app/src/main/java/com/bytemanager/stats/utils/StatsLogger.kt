@@ -28,14 +28,16 @@ class StatsLogger @Inject constructor(
         val notificationManager = appContext.getSystemService(NotificationManager::class.java)
 
         batteryStateRepository.flowOfTimestampedRawBatteryState.collect { timestampedRawBatteryState ->
-            if(dataStoreRepository.isDataLoggingEnabled()) {
+            val isDataLoggingEnabled = dataStoreRepository.isDataLoggingEnabled()
+            val isNotificationsEnabled = dataStoreRepository.isNotificationsEnabled()
+
+            Log.d("StatsLogger", "Received new battery state: $timestampedRawBatteryState, isDataLoggingEnabled = $isDataLoggingEnabled, isNotificationsEnabled = $isNotificationsEnabled")
+
+            if(isDataLoggingEnabled) {
                 logTemperature(timestampedRawBatteryState)
             }
 
-            if(
-                dataStoreRepository.isNotificationPermissionObtained() &&
-                dataStoreRepository.isNotificationEnabled()
-            ) {
+            if(isNotificationsEnabled) {
                 notifyLogging(timestampedRawBatteryState, notificationManager)
             }
         }

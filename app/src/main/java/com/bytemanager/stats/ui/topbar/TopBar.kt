@@ -10,6 +10,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bytemanager.stats.R
 import com.bytemanager.stats.StatsAppScreen
-import com.bytemanager.stats.ui.theme.AppTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +62,7 @@ fun NavBackIcon(navigateUp: () -> Unit) {
 fun PageTitle(title: String) {
     Text(
         text = title,
-        style = AppTypography.headlineSmall
+        style = MaterialTheme.typography.titleMedium,
     )
 }
 
@@ -96,7 +96,7 @@ fun OptionsIcon(
                         text = {
                             Text(
                                 text = stringResource(R.string.settings_option),
-                                style = AppTypography.labelLarge
+                                style = MaterialTheme.typography.labelLarge,
                             )
                         },
                         onClick = {
@@ -111,7 +111,7 @@ fun OptionsIcon(
                         text = {
                             Text(
                                 text = stringResource(R.string.privacy_policy_option),
-                                style = AppTypography.labelLarge
+                                style = MaterialTheme.typography.labelLarge,
                             )
                         },
                         onClick = {

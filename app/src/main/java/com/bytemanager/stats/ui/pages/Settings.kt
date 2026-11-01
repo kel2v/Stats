@@ -25,17 +25,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bytemanager.stats.R
-import com.bytemanager.stats.ui.theme.AppTypography
 
 @Composable
 fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
+    val spacingBetweenPreferences = 25.dp
+
     val settingsUiState by settingsViewModel.stateFlowOfSettingsUiState.collectAsState()
 
     val isDataLoggingEnabled= settingsUiState.isDataLoggingEnabled
-    val isNotificationEnabled = settingsUiState.isNotificationEnabled
+    val areNotificationsEnabled = settingsUiState.isNotificationsEnabled
     val isFahrenheit = settingsUiState.isFahrenheit
     val isMovingAverageForVoltageGraphEnabled = settingsUiState.isMovingAverageForVoltageGraphEnabled
     val isCutmullRomCurveEnabled = settingsUiState.isCutmullRomCurveEnabled
+    val isIgnoringBatteryOptimizations = settingsUiState.isIgnoringBatteryOptimizations
+    val isAutostartLoggingServiceEnabled = settingsUiState.isAutostartLoggingServiceEnabled
 
     Column (
         modifier = Modifier
@@ -44,43 +47,6 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        PreferenceGroup (
-            name = stringResource(R.string.data_logging_and_notification_preference_group),
-        ) {
-            TogglingPreference(
-                label = stringResource(R.string.data_logging_preference),
-                description = null,
-                isChecked = isDataLoggingEnabled,
-                enabled = true,
-                onCheckedChange = {
-                    settingsViewModel.toggleDataLogging()
-                },
-            )
-
-            TogglingPreference(
-                label = stringResource(R.string.notification_preference),
-                description = null,
-                isChecked = isNotificationEnabled,
-                enabled = isDataLoggingEnabled,
-                onCheckedChange = {
-                    settingsViewModel.toggleNotification()
-                }
-            )
-        }
-
-        PreferenceGroup (
-            name = stringResource(R.string.database_management_preference_group),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ImportForm()
-                ExportForm()
-                ResetForm()
-            }
-        }
-
         PreferenceGroup(
             name = stringResource(R.string.units_preference_group),
         ) {
@@ -106,6 +72,8 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 }
             )
 
+            Spacer(Modifier.height(spacingBetweenPreferences))
+
             TogglingPreference(
                 label = stringResource(R.string.catmull_rom_curve_preference),
                 description = stringResource(R.string.catmull_rom_curve_preference_description),
@@ -114,6 +82,100 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                     settingsViewModel.toggleCutmullRomCurveChoice()
                 }
             )
+        }
+
+        PreferenceGroup(
+            name = stringResource(R.string.permissions_and_exemptions_preference_group)
+        ) {
+            TogglingPreference(
+                label = stringResource(R.string.notification_preference),
+                description = stringResource(R.string.notification_preference_description),
+                isChecked = areNotificationsEnabled,
+                onCheckedChange = {
+                    settingsViewModel.toggleNotifications()
+                }
+            )
+
+            Spacer(Modifier.height(spacingBetweenPreferences))
+
+            TogglingPreference(
+                label = stringResource(R.string.battery_optimizations_exemption_preference),
+                description = stringResource(R.string.battery_optimizations_exemption_description),
+                isChecked = isIgnoringBatteryOptimizations,
+                onCheckedChange = {
+                    settingsViewModel.openBatteryOptimizationsSettings()
+                }
+            )
+        }
+
+        PreferenceGroup (
+            name = stringResource(R.string.data_logging_and_database_management_group),
+        ) {
+            TogglingPreference(
+                label = stringResource(R.string.data_logging_preference),
+                description = null,
+                isChecked = isDataLoggingEnabled,
+                enabled = true,
+                onCheckedChange = {
+                    settingsViewModel.toggleDataLogging()
+                },
+            )
+
+            Spacer(Modifier.height(spacingBetweenPreferences))
+
+            TogglingPreference(
+                label = "Autostart logging after boot",
+                description = "Starts the data logging foreground service automatically after the device boots up",
+                isChecked = isAutostartLoggingServiceEnabled,
+                enabled = isDataLoggingEnabled,
+                onCheckedChange = {
+                    settingsViewModel.toggleIsAutostartLoggingServiceChoice()
+                },
+            )
+
+            Spacer(Modifier.height(spacingBetweenPreferences))
+
+            Column(
+                modifier = Modifier
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(15.dp)
+                    )
+                    .padding(20.dp)
+                    .fillMaxWidth()
+                ,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Column() {
+                    Text(
+                        text = "Database management",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+
+                    Spacer(Modifier.height(40.dp))
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth(0.7f)
+                        ){
+                            ImportForm()
+
+                            Spacer(Modifier.height(10.dp))
+
+                            ExportForm()
+
+                            Spacer(Modifier.height(10.dp))
+
+                            ResetForm()
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -134,7 +196,7 @@ fun TogglingPreference(
                 color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(15.dp)
             )
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
             .fillMaxWidth()
 
     ) {
@@ -146,8 +208,8 @@ fun TogglingPreference(
         ) {
             Text(
                 text = label,
-                style = AppTypography.bodyLarge,
-                modifier = Modifier.fillMaxWidth(0.7f)
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth(0.7f),
             )
 
             Switch(
@@ -158,10 +220,12 @@ fun TogglingPreference(
         }
 
         if (description != null) {
+            Spacer(Modifier.height(30.dp))
+
             Text(
                 text = description,
                 modifier = Modifier.padding(vertical = 10.dp),
-                style = AppTypography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
         }
     }
@@ -185,11 +249,11 @@ fun PreferenceGroup(
             .fillMaxWidth(0.9f)
     ) {
         Column(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
             Text(
                 text = name,
-                style = AppTypography.titleLarge
+                style = MaterialTheme.typography.titleSmall,
             )
 
             Spacer(Modifier.height(20.dp))

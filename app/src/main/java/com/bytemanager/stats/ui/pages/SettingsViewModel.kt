@@ -1,19 +1,20 @@
 package com.bytemanager.stats.ui.pages
 
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bytemanager.stats.data.repository.DataStoreRepository
-import com.bytemanager.stats.services.notification.StatsLoggingNotificationService
+import com.bytemanager.stats.services.notification.StatsLoggingService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,10 +26,12 @@ class SettingsViewModel @Inject constructor(
         .map { settings ->
         SettingsUiState(
             isDataLoggingEnabled = settings.isDataLoggingEnabled,
-            isNotificationEnabled = settings.isNotificationEnabled,
+            isNotificationsEnabled = settings.isNotificationsEnabled,
             isFahrenheit = settings.isFahrenheit,
             isMovingAverageForVoltageGraphEnabled = settings.isMovingAverageForVoltageGraphEnabled,
-            isCutmullRomCurveEnabled = settings.isCutmullRomCurveEnabled
+            isCutmullRomCurveEnabled = settings.isCutmullRomCurveEnabled,
+            isIgnoringBatteryOptimizations = settings.isIgnoringBatteryOptimizations,
+            isAutostartLoggingServiceEnabled = settings.isAutostartLoggingServiceEnabled
         )
     }.stateIn(
         scope = viewModelScope,
@@ -38,55 +41,64 @@ class SettingsViewModel @Inject constructor(
 
     fun toggleDataLogging() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                dataStoreRepository.toggleDataLogging()
+            dataStoreRepository.toggleDataLogging()
 
-                if(dataStoreRepository.stateFlowOfSettings.value.isDataLoggingEnabled) {
-                    StatsLoggingNotificationService.startForegroundService(appContext)
-                } else {
-                    StatsLoggingNotificationService.stopService(appContext)
-                }
+            if(dataStoreRepository.stateFlowOfSettings.value.isDataLoggingEnabled) {
+                StatsLoggingService.startForegroundService(appContext)
+            } else {
+                StatsLoggingService.stopService(appContext)
             }
         }
     }
 
-    fun toggleNotification() {
+    fun toggleNotifications() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                dataStoreRepository.toggleNotificationEnabled()
-            }
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, appContext.packageName)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            appContext.startActivity(intent)
         }
     }
 
     fun toggleFahrenheitChoice() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                dataStoreRepository.toggleFahrenheitChoice()
-            }
+            dataStoreRepository.toggleFahrenheitChoice()
         }
     }
 
     fun toggleMovingAverageForVoltageGraphChoice() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                dataStoreRepository.toggleIsMovingAverageForVoltageGraphEnabledChoice()
-            }
+            dataStoreRepository.toggleIsMovingAverageForVoltageGraphEnabledChoice()
         }
     }
 
     fun toggleCutmullRomCurveChoice() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                dataStoreRepository.toggleIsCutmullRomCurveEnabled()
-            }
+            dataStoreRepository.toggleIsCutmullRomCurveEnabled()
+        }
+    }
+
+    fun openBatteryOptimizationsSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            .setData("package:${appContext.packageName}".toUri())
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        appContext.startActivity(intent)
+    }
+
+    fun toggleIsAutostartLoggingServiceChoice() {
+        viewModelScope.launch {
+            dataStoreRepository.toggleIsAutostartLoggingServiceChoice()
         }
     }
 }
 
 data class SettingsUiState(
     val isDataLoggingEnabled: Boolean = false,
-    val isNotificationEnabled: Boolean = false,
+    val isNotificationsEnabled: Boolean = false,
     val isFahrenheit: Boolean = false,
     val isMovingAverageForVoltageGraphEnabled: Boolean = true,
-    val isCutmullRomCurveEnabled: Boolean = true
+    val isCutmullRomCurveEnabled: Boolean = true,
+    val isIgnoringBatteryOptimizations: Boolean = false,
+    val isAutostartLoggingServiceEnabled: Boolean = false,
 )

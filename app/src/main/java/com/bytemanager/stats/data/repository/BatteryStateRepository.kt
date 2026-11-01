@@ -85,7 +85,7 @@ class BatteryStateRepository @Inject constructor(
         }
     }.stateIn(
         scope = scope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = "-"
     )
     val stateFlowOfTimestampedBatteryState = flowOfTimestampedRawBatteryState
@@ -94,7 +94,7 @@ class BatteryStateRepository @Inject constructor(
         }
         .stateIn(
             scope = scope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = TimestampedBatteryState()
         )
 }

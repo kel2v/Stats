@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.bytemanager.stats.ui.theme.AppTypography
 
 @Composable
 fun ListItem(
@@ -45,7 +44,7 @@ fun ListItem(
                     .padding(15.dp)
                     .weight(0.5f)
                 ,
-                style = AppTypography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
             )
 
@@ -57,7 +56,7 @@ fun ListItem(
                     .padding(15.dp)
                     .weight(0.5f)
                 ,
-                style = AppTypography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
             )
         }

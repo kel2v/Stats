@@ -80,27 +80,23 @@ Press 'Confirm' to continue resetting the database."
     </string>
 
 
-    <string name="data_logging_and_notification_preference_group">Data logging and notification</string>
-    <string name="database_management_preference_group">Database management</string>
+    <string name="data_logging_and_database_management_group">Data logging and Database management</string>
     <string name="units_preference_group">Units</string>
     <string name="graphs_preference_group">Graphs</string>
+    <string name="permissions_and_exemptions_preference_group">Permissions and exemptions</string>
 
     <string name="data_logging_preference">Data logging</string>
-    <string name="notification_preference">Notification</string>
+    <string name="notification_preference">Notifications</string>
     <string name="show_temperature_in_fahrenheits_preference">Show temperature in Fahrenheits</string>
     <string name="moving_average_preference">Moving average</string>
     <string name="catmull_rom_curve_preference">Catmull-Rom curve</string>
+    <string name="battery_optimizations_exemption_preference">Exemption from battery optimizations</string>
+
 
     <string name="moving_average_preference_description">"Performs moving average transformation on graph's y-axis data to reduce abrupt changes in value"</string>
     <string name="catmull_rom_curve_preference_description">"Transforms sharp-edges of the graph into curvy lines"</string>
-
-
-
-
-
-
-
-
+    <string name="battery_optimizations_exemption_description">For better performance, please exempt this app from getting restricted by battery optimizations by setting it to \'unrestricted\' mode in the \'battery usage\' settings.\n\nClicking this toggle switch will redirect you to the \'app settings\' of this app, there you can set battery optimization mode for this app.</string>
+    <string name="notification_preference_description">Clicking this toggle switch will redirect you to the \'notification settings\' of this app, there you can enable or disable notifications from this app</string>
 
 
 </resources>

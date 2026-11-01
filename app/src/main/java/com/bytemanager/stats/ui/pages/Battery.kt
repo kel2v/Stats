@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bytemanager.stats.R
 import com.bytemanager.stats.ui.listitem.ListItem
-import com.bytemanager.stats.ui.theme.AppTypography
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -78,7 +78,7 @@ fun Battery(
         ) {
             Text(
                 text = stringResource(R.string.battery_graphs_button),
-                style = AppTypography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
             )
         }
 
