@@ -6,8 +6,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,10 +18,12 @@ import androidx.navigation.compose.rememberNavController
 import com.bytemanager.stats.ui.pages.Battery
 import com.bytemanager.stats.ui.pages.BatteryGraphs
 import com.bytemanager.stats.ui.pages.PrivacyPolicy
+import com.bytemanager.stats.ui.pages.QuickSetup
 import com.bytemanager.stats.ui.pages.Settings
 import com.bytemanager.stats.ui.topbar.TopBar
 
 enum class StatsAppScreen(@StringRes val title: Int) {
+    QUICK_SETUP(title = R.string.quick_setup_page_title),
     BATTERY_DASHBOARD(title = R.string.battery_dashboard_title),
     Settings(title = R.string.settings_page_title),
     PrivacyPolicy(title = R.string.privacy_policy_page_title),
@@ -27,8 +31,10 @@ enum class StatsAppScreen(@StringRes val title: Int) {
 }
 @Composable
 fun StatsApp(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    viewModel: StatsAppViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.stateFlowOfStatsAppUiState.collectAsState()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = StatsAppScreen.valueOf(backStackEntry?.destination?.route ?: StatsAppScreen.BATTERY_DASHBOARD.name)
 
@@ -47,9 +53,18 @@ fun StatsApp(
 
         NavHost(
             navController = navController,
-            startDestination = StatsAppScreen.BATTERY_DASHBOARD.name,
+            startDestination = if(uiState.showQuickSetup) StatsAppScreen.QUICK_SETUP.name else StatsAppScreen.BATTERY_DASHBOARD.name,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(
+                route = StatsAppScreen.QUICK_SETUP.name,
+                enterTransition = { fadeIn() },
+                exitTransition = { fadeOut() },
+                popEnterTransition = { fadeIn() },
+                popExitTransition = { fadeOut() }
+            ) {
+                QuickSetup()
+            }
 
             composable(
                 route = StatsAppScreen.BATTERY_DASHBOARD.name,

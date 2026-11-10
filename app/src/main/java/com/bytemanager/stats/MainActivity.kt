@@ -1,13 +1,16 @@
 package com.bytemanager.stats
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,17 +28,26 @@ class MainActivity: ComponentActivity() {
     @Inject
     lateinit var dataStoreRepository: DataStoreRepository
 
-    @SuppressLint("BatteryLife")
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         Log.d("MainActivity", "running onCreate")
-        enableEdgeToEdge()
 
         lifecycleScope.launch {
             if(dataStoreRepository.isDataLoggingEnabled()) {
                 StatsLoggingService.startForegroundService(applicationContext)
             }
+        }
+
+        val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            lifecycleScope.launch { dataStoreRepository.setIsNotificationsEnabled(granted) }
+        }
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            lifecycleScope.launch { dataStoreRepository.setIsNotificationsEnabled(true) }
         }
 
         setContent {

@@ -1,10 +1,10 @@
 [versions]
 # ============== PLUGINS =================
 # AGP
-agp = "9.5.0"
+agp = "9.5.1"
 
 #Kotlin
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 
 # Hilt
 hilt = "2.60.1"
@@ -20,11 +20,11 @@ androidxComposeBom = "2026.09.00"
 
 # other androidx dependencies
 androidxActivityCompose = "1.13.0"
-androidxCoreKtx = "1.19.0"
-androidxDatastorePreferences = "1.2.1"
+androidxCoreKtx = "1.19.1"
+androidxDatastorePreferences = "1.3.0"
 androidxHilt = "1.4.0"
 androidxLifecycle = "2.11.0"
-androidxNavigationCompose = "2.10.1"
+androidxNavigationCompose = "2.10.2"
 androidxComposeRuntime = "1.12.1"
 
 # Room

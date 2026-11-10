@@ -32,6 +32,8 @@ import com.bytemanager.stats.data.types.GraphType
 import com.bytemanager.stats.ui.graphs.DayWiseLineGraph
 import com.bytemanager.stats.utils.StatsTimeUtils
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 
 @Composable
@@ -194,26 +196,15 @@ private fun SelectedDateLabel(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "${stringResource(R.string.date_selected)}: $date" + if(date == today) " (${stringResource(R.string.today)})" else "",
-            style = MaterialTheme.typography.labelLarge,
+            text = "${date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))}" + if(date == today) " (${stringResource(R.string.today)})" else "",
+            style = MaterialTheme.typography.bodyLarge,
         )
 
         Spacer(Modifier.height(2.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(0.9f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(
-                onClick = onPrevButtonClick,
-            ) {
-                Text(
-                    text = stringResource(R.string.prev),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-
             Button(
                 onClick = onSelectDateButtonClick
             ) {
@@ -223,14 +214,29 @@ private fun SelectedDateLabel(
                 )
             }
 
-            Button(
-                onClick = onNextButtonClick,
-                enabled = !date.plusDays(1).isAfter(today)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(0.9f)
             ) {
-                Text(
-                    text = stringResource(R.string.next),
-                    style = MaterialTheme.typography.labelLarge,
-                )
+                Button(
+                    onClick = onPrevButtonClick,
+                ) {
+                    Text(
+                        text = stringResource(R.string.prev),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+
+                Button(
+                    onClick = onNextButtonClick,
+                    enabled = !date.plusDays(1).isAfter(today)
+                ) {
+                    Text(
+                        text = stringResource(R.string.next),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
             }
         }
     }

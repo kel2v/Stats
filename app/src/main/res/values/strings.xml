@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Stats</string>
+
     <string name="nav_back_icon">Navigate back to previous page</string>
     <string name="premium_icon">Upgrade to Premium</string>
     <string name="menu_icon">Menu</string>
@@ -9,6 +10,7 @@
     <string name="settings_option">Settings</string>
     <string name="privacy_policy_option">Privacy Policy</string>
     <string name="licenses_option">Licenses</string>
+
     <string name="dashboard_page_title">Dashboard</string>
     <string name="battery_dashboard_title">Battery Dashboard</string>
     <string name="network_page_title">Network</string>
@@ -16,6 +18,8 @@
     <string name="settings_page_title">Settings</string>
     <string name="privacy_policy_page_title">Privacy Policy</string>
     <string name="licenses_page_title">Licenses</string>
+    <string name="quick_setup_page_title">Quick Setup</string>
+
 
     <string name="battery_health_cold">Cold</string>
     <string name="battery_health_dead">Dead</string>
@@ -31,14 +35,17 @@
     <string name="battery_status_not_charging">Not charging</string>
     <string name="battery_status_unknown">Unknown</string>
     <string name="not_available">Not available</string>
+
     <string name="selected_graph">Selected graph</string>
     <string name="live_graph">Live graph</string>
     <string name="day_graph">Day graph</string>
     <string name="week_graph">Week graph</string>
     <string name="month_graph">Month graph</string>
     <string name="year_graph">Year graph</string>
+
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
+
     <string name="date_selected">Date selected</string>
     <string name="select_date">Select date</string>
     <string name="no_data_found">No data found</string>
@@ -72,11 +79,10 @@
 
     <string name="reset_button">Reset</string>
     <string name="warning">Warning</string>
-    <string name="warning_message">"Clicking 'Confirm' would delete all the historical battery-related logged data, including battery temperature, battery voltage, battery levels, etc.
-
-To avoid accidental data loss, all the data will be exported to a file that you can access in your internal storage's 'Downloads' folder.
-
-Press 'Confirm' to continue resetting the database."
+    <string name="warning_message">
+        "Confirming will delete all history, including battery temperature, voltage, and levels.
+To prevent data loss, a backup will be exported to your device\'s \'Downloads\' folder.
+Tap "Confirm" to reset the database."
     </string>
 
 
@@ -84,6 +90,8 @@ Press 'Confirm' to continue resetting the database."
     <string name="units_preference_group">Units</string>
     <string name="graphs_preference_group">Graphs</string>
     <string name="permissions_and_exemptions_preference_group">Permissions and exemptions</string>
+    <string name="features_preference_group">Features</string>
+    <string name="permissions_preference_group">Permissions</string>
 
     <string name="data_logging_preference">Data logging</string>
     <string name="notification_preference">Notifications</string>
@@ -91,12 +99,23 @@ Press 'Confirm' to continue resetting the database."
     <string name="moving_average_preference">Moving average</string>
     <string name="catmull_rom_curve_preference">Catmull-Rom curve</string>
     <string name="battery_optimizations_exemption_preference">Exemption from battery optimizations</string>
+    <string name="autostart_logging_on_boot_preference">Autostart logging on boot</string>
+    <string name="manage_database_preference">Manage database</string>
 
 
-    <string name="moving_average_preference_description">"Performs moving average transformation on graph's y-axis data to reduce abrupt changes in value"</string>
-    <string name="catmull_rom_curve_preference_description">"Transforms sharp-edges of the graph into curvy lines"</string>
-    <string name="battery_optimizations_exemption_description">For better performance, please exempt this app from getting restricted by battery optimizations by setting it to \'unrestricted\' mode in the \'battery usage\' settings.\n\nClicking this toggle switch will redirect you to the \'app settings\' of this app, there you can set battery optimization mode for this app.</string>
-    <string name="notification_preference_description">Clicking this toggle switch will redirect you to the \'notification settings\' of this app, there you can enable or disable notifications from this app</string>
+    <string name="moving_average_preference_description">Smooths graph data using a moving average to reduce sharp spikes.</string>
+    <string name="catmull_rom_curve_preference_description">Smoothens the sharp-edges of the graph.</string>
+    <string name="battery_optimizations_exemption_description">
+        "For best performance, change battery usage to \'Unrestricted\' in app settings. Tap the toggle switch to go to the settings."
+    </string>
+    <string name="notification_preference_description">Tap the switch to open notification settings and manage alerts for this app.</string>
+    <string name="autostart_logging_on_boot_preference_description">Automatically starts data logging when your device boots up.</string>
+    <string name="data_logging_preference_description">Continuous battery updates logging</string>
 
+
+    <string name="quick_setup_description">Turn on these essential features to get started</string>
+
+    <string name="skip_button">Skip</string>
+    <string name="done_button">Done</string>
 
 </resources>

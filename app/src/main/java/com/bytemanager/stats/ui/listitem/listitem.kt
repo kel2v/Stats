@@ -48,7 +48,7 @@ fun ListItem(
                 textAlign = TextAlign.Start,
             )
 
-            Spacer(Modifier.width(30.dp))
+            Spacer(Modifier.width(20.dp))
 
             Text(
                 text = parameterValue,

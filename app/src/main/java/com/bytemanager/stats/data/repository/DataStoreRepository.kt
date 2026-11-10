@@ -36,6 +36,7 @@ class DataStoreRepository @Inject constructor(
         val IS_CUTMULL_ROM_CURVE_ENABLED = booleanPreferencesKey("is_cutmull_rom_curve_enabled")
         val IS_IGNORING_BATTERY_OPTIMIZATIONS = booleanPreferencesKey("is_ignoring_battery_optimizations")
         val IS_AUTOSTART_LOGGING_SERVICE_ENABLED = booleanPreferencesKey("is_autostart_logging_service_enabled")
+        val SHOW_GETTING_STARTED = booleanPreferencesKey("show_getting_started")
     }
 
     val stateFlowOfSettings: StateFlow<Settings> = dataStore.data.map { preferences ->
@@ -46,7 +47,8 @@ class DataStoreRepository @Inject constructor(
             isMovingAverageForVoltageGraphEnabled = preferences[Keys.IS_MOVING_AVERAGE_FOR_VOLTAGE_GRAPH_ENABLED] ?: true,
             isCutmullRomCurveEnabled = preferences[Keys.IS_CUTMULL_ROM_CURVE_ENABLED] ?: true,
             isIgnoringBatteryOptimizations = preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] ?: false,
-            isAutostartLoggingServiceEnabled = preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false
+            isAutostartLoggingServiceEnabled = preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false,
+            showQuickSetup = preferences[Keys.SHOW_GETTING_STARTED] ?: true
         )
 
         Log.d("DataStoreRepository", "emitted new Settings value: $e")
@@ -170,6 +172,18 @@ class DataStoreRepository @Inject constructor(
             preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] = !initialValue
         }
     }
+
+    suspend fun setShowGettingStarted(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[Keys.SHOW_GETTING_STARTED] = value
+        }
+    }
+
+    suspend fun showGettingStarted(): Boolean {
+        return dataStore.data.map { preferences ->
+            preferences[Keys.SHOW_GETTING_STARTED] ?: true
+        }.first()
+    }
 }
 
 data class Settings(
@@ -180,6 +194,7 @@ data class Settings(
     val isCutmullRomCurveEnabled: Boolean = true,
     val isIgnoringBatteryOptimizations: Boolean = false,
     val isAutostartLoggingServiceEnabled: Boolean = false,
+    val showQuickSetup: Boolean = false
 )
 
 object DeviceContextDataStoreProvider {

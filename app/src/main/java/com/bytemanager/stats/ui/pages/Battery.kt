@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -60,13 +61,36 @@ fun Battery(
             parameterName = stringResource(R.string.battery_level_label),
             parameterValue = "${batteryState.level?:"-"}%",
         )
+
+        val voltValue = when {
+            batteryState.voltage == null -> "-"
+            else -> String.format(
+                locale = LocalLocale.current.platformLocale,
+                format = "%.3f",
+                batteryState.voltage
+            )
+        }
         ListItem(
             parameterName = stringResource(R.string.battery_voltage_label),
-            parameterValue = "${batteryState.voltage?:"-"} V",
+            parameterValue = "$voltValue V",
         )
+
+        val tempValue = when {
+            batteryState.temperature == null -> "-"
+            isFahrenheit -> String.format(
+                locale = LocalLocale.current.platformLocale,
+                format = "%.1f",
+                (batteryState.temperature * 1.8f) + 32
+            )
+            else -> String.format(
+                locale = LocalLocale.current.platformLocale,
+                format = "%.1f",
+                batteryState.temperature
+            )
+        }
         ListItem(
             parameterName = stringResource(R.string.battery_temperature_label),
-            parameterValue = "${batteryState.temperature?:"-"} °${if(isFahrenheit) "F" else "C"}",
+            parameterValue = "$tempValue °${if(isFahrenheit) "F" else "C"}",
         )
 
         Spacer(Modifier.height(40.dp))

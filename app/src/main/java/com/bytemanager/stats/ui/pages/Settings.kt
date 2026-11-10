@@ -1,7 +1,5 @@
 package com.bytemanager.stats.ui.pages
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +28,8 @@ import com.bytemanager.stats.R
 
 @Composable
 fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
-    val spacingBetweenPreferences = 25.dp
+    val spacingBetweenPreferences = @Composable { Spacer(Modifier.height(15.dp)) }
+    val spacingBetweenPreferenceGroups = @Composable { Spacer(Modifier.height(25.dp)) }
 
     val settingsUiState by settingsViewModel.stateFlowOfSettingsUiState.collectAsState()
 
@@ -47,6 +48,8 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        spacingBetweenPreferenceGroups()
+
         PreferenceGroup(
             name = stringResource(R.string.units_preference_group),
         ) {
@@ -60,6 +63,8 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
             )
         }
 
+        spacingBetweenPreferenceGroups()
+
         PreferenceGroup(
             name = stringResource(R.string.graphs_preference_group)
         ) {
@@ -72,7 +77,7 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 }
             )
 
-            Spacer(Modifier.height(spacingBetweenPreferences))
+            spacingBetweenPreferences()
 
             TogglingPreference(
                 label = stringResource(R.string.catmull_rom_curve_preference),
@@ -83,6 +88,8 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 }
             )
         }
+
+        spacingBetweenPreferenceGroups()
 
         PreferenceGroup(
             name = stringResource(R.string.permissions_and_exemptions_preference_group)
@@ -96,7 +103,7 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 }
             )
 
-            Spacer(Modifier.height(spacingBetweenPreferences))
+            spacingBetweenPreferences()
 
             TogglingPreference(
                 label = stringResource(R.string.battery_optimizations_exemption_preference),
@@ -108,12 +115,14 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
             )
         }
 
+        spacingBetweenPreferenceGroups()
+
         PreferenceGroup (
             name = stringResource(R.string.data_logging_and_database_management_group),
         ) {
             TogglingPreference(
                 label = stringResource(R.string.data_logging_preference),
-                description = null,
+                description = stringResource(R.string.data_logging_preference_description),
                 isChecked = isDataLoggingEnabled,
                 enabled = true,
                 onCheckedChange = {
@@ -121,11 +130,11 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 },
             )
 
-            Spacer(Modifier.height(spacingBetweenPreferences))
+            spacingBetweenPreferences()
 
             TogglingPreference(
-                label = "Autostart logging after boot",
-                description = "Starts the data logging foreground service automatically after the device boots up",
+                label = stringResource(R.string.autostart_logging_on_boot_preference),
+                description = stringResource(R.string.autostart_logging_on_boot_preference_description),
                 isChecked = isAutostartLoggingServiceEnabled,
                 enabled = isDataLoggingEnabled,
                 onCheckedChange = {
@@ -133,23 +142,20 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 },
             )
 
-            Spacer(Modifier.height(spacingBetweenPreferences))
+            spacingBetweenPreferences()
 
-            Column(
+            OutlinedCard (
                 modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(15.dp)
-                    )
-                    .padding(20.dp)
-                    .fillMaxWidth()
-                ,
-                horizontalAlignment = Alignment.Start
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(15.dp),
             ) {
-                Column() {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
                     Text(
-                        text = "Database management",
+                        text = stringResource(R.string.manage_database_preference),
                         style = MaterialTheme.typography.bodyLarge,
                     )
 
@@ -177,6 +183,8 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 }
             }
         }
+
+        spacingBetweenPreferenceGroups()
     }
 }
 
@@ -189,44 +197,44 @@ fun TogglingPreference(
     enabled: Boolean = true,
     onCheckedChange: () -> Unit,
 ) {
-    Column(
+    OutlinedCard (
         modifier = modifier
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(15.dp)
-            )
-            .padding(horizontal = 20.dp, vertical = 20.dp)
-            .fillMaxWidth()
-
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
+                .padding(10.dp)
         ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.fillMaxWidth(0.7f),
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.fillMaxWidth(0.7f),
+                )
 
-            Switch(
-                checked = isChecked,
-                onCheckedChange = { onCheckedChange() },
-                enabled = enabled,
-            )
-        }
+                Switch(
+                    checked = isChecked,
+                    onCheckedChange = { onCheckedChange() },
+                    enabled = enabled,
+                )
+            }
 
-        if (description != null) {
-            Spacer(Modifier.height(30.dp))
+            if (description != null) {
+                Spacer(Modifier.height(15.dp))
 
-            Text(
-                text = description,
-                modifier = Modifier.padding(vertical = 10.dp),
-                style = MaterialTheme.typography.bodySmall,
-            )
+                Text(
+                    text = description,
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
     }
 
@@ -239,28 +247,23 @@ fun PreferenceGroup(
     name: String,
     block: @Composable () -> Unit
 ) {
-    Card(
+    Card (
         shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(
-            width = 2.dp,
-            color = MaterialTheme.colorScheme.outline
-        ),
         modifier = Modifier
-            .fillMaxWidth(0.9f)
+            .fillMaxWidth(0.9f),
+        elevation = CardDefaults.elevatedCardElevation(5.dp)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(15.dp)
         ) {
             Text(
                 text = name,
                 style = MaterialTheme.typography.titleSmall,
             )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(15.dp))
 
             block()
         }
     }
-
-    Spacer(Modifier.height(20.dp))
 }

@@ -217,10 +217,12 @@ fun DayWiseLineGraph(
                                 "${value.toInt()} %"
                             }
                             GraphType.VOLTAGE -> {
-                                "${String.format(
-                                    locale = Locale.getDefault(), 
-                                    format = "%.1f", 
-                                    value)
+                                "${
+                                    String.format(
+                                        locale = Locale.getDefault(), 
+                                        format = "%.1f", 
+                                        value
+                                    )
                                 } V"
                             }
                         }
