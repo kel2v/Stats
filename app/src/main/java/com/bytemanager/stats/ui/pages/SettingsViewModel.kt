@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bytemanager.stats.data.repository.DataStoreRepository
+import com.bytemanager.stats.data.repository.NotificationIconInfoType
 import com.bytemanager.stats.services.notification.StatsLoggingService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,7 +23,7 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val dataStoreRepository: DataStoreRepository
 ): ViewModel() {
-    val stateFlowOfSettingsUiState: StateFlow<SettingsUiState> = dataStoreRepository.stateFlowOfSettings
+    val stateFlowOfSettingsUiState: StateFlow<SettingsUiState> = dataStoreRepository.flowOfSettings
         .map { settings ->
         SettingsUiState(
             isDataLoggingEnabled = settings.isDataLoggingEnabled,
@@ -31,7 +32,8 @@ class SettingsViewModel @Inject constructor(
             isMovingAverageForVoltageGraphEnabled = settings.isMovingAverageForVoltageGraphEnabled,
             isCutmullRomCurveEnabled = settings.isCutmullRomCurveEnabled,
             isIgnoringBatteryOptimizations = settings.isIgnoringBatteryOptimizations,
-            isAutostartLoggingServiceEnabled = settings.isAutostartLoggingServiceEnabled
+            isAutostartLoggingServiceEnabled = settings.isAutostartLoggingServiceEnabled,
+            selectedNotificationIconInfo = settings.notificationIconInfoPreference
         )
     }.stateIn(
         scope = viewModelScope,
@@ -43,7 +45,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             dataStoreRepository.toggleDataLogging()
 
-            if(dataStoreRepository.stateFlowOfSettings.value.isDataLoggingEnabled) {
+            if(stateFlowOfSettingsUiState.value.isDataLoggingEnabled) {
                 StatsLoggingService.startForegroundService(appContext)
             } else {
                 StatsLoggingService.stopService(appContext)
@@ -91,6 +93,12 @@ class SettingsViewModel @Inject constructor(
             dataStoreRepository.toggleIsAutostartLoggingServiceChoice()
         }
     }
+
+    fun setNotificationIconInfoPreference(choice: NotificationIconInfoType) {
+        viewModelScope.launch {
+            dataStoreRepository.setNotificationIconInfoPreference(choice)
+        }
+    }
 }
 
 data class SettingsUiState(
@@ -101,4 +109,5 @@ data class SettingsUiState(
     val isCutmullRomCurveEnabled: Boolean = true,
     val isIgnoringBatteryOptimizations: Boolean = false,
     val isAutostartLoggingServiceEnabled: Boolean = false,
+    val selectedNotificationIconInfo: Int = NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal
 )

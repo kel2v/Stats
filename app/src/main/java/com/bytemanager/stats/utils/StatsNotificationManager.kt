@@ -17,8 +17,9 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.withScale
 import com.bytemanager.stats.MainActivity
+import com.bytemanager.stats.R
+import com.bytemanager.stats.data.repository.NotificationIconInfoType
 import com.bytemanager.stats.data.types.TimestampedBatteryState
-import kotlin.math.roundToInt
 
 object StatsNotificationManager {
     fun createStatsNotificationChannel(appContext: Context) {
@@ -43,7 +44,13 @@ object StatsNotificationManager {
         notificationManager.deleteNotificationChannel("Stats")
     }
 
-    fun buildStatsNotification(appContext: Context, timestampedBatteryState: TimestampedBatteryState): Notification {
+    fun buildStatsNotification(
+        appContext: Context,
+        timestampedBatteryState: TimestampedBatteryState,
+        throttlingStatus: Int?,
+        notificationIconInfoPreference: Int,
+        isFahrenheit: Boolean,
+    ): Notification {
         val channelId = "Stats"
         val intent = Intent(appContext, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
@@ -53,9 +60,30 @@ object StatsNotificationManager {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val icon = when(notificationIconInfoPreference) {
+            NotificationIconInfoType.APP_ICON.ordinal -> IconCompat.createWithResource(appContext, R.drawable.status_bar_icon)
+
+            NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal -> IconCompat.createWithBitmap(
+                textBitmap(BatteryStateRepositoryUtils.getTemperatureVerbose(timestampedBatteryState, isFahrenheit, shorter = true))
+            )
+
+            NotificationIconInfoType.THROTTLING_STATUS.ordinal -> IconCompat.createWithBitmap(
+                textBitmap(ThermalStateRepositoryUtils.getThermalThrottlingStatusShortString(throttlingStatus))
+            )
+
+            else -> IconCompat.createWithBitmap(
+                textBitmap(BatteryStateRepositoryUtils.getTemperatureVerbose(timestampedBatteryState, isFahrenheit, shorter = true))
+            )
+        }
+
         val notification = NotificationCompat.Builder(appContext, channelId)
-            .setSmallIcon(IconCompat.createWithBitmap(textBitmap("${ if (timestampedBatteryState.temperature == null) '-' else timestampedBatteryState.temperature.roundToInt()}°")))
-            .setContentTitle("${timestampedBatteryState.level}% | ${timestampedBatteryState.temperature} °C | ${timestampedBatteryState.voltage} V")
+            .setSmallIcon(icon)
+            .setContentTitle(
+                    BatteryStateRepositoryUtils.getBatteryLevelPercentageVerbose(timestampedBatteryState) +
+                    " | ${BatteryStateRepositoryUtils.getTemperatureVerbose(timestampedBatteryState, isFahrenheit)}" +
+                    " | ${BatteryStateRepositoryUtils.getVoltageVerbose(timestampedBatteryState)}"
+            )
+            .setContentText(ThermalStateRepositoryUtils.getThermalThrottlingStatusVerbose(throttlingStatus))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
@@ -80,8 +108,7 @@ object StatsNotificationManager {
         }
 
         val baseline = height / 2f - (paint.ascent() + paint.descent()) / 2f
-
-        canvas.withScale(1f, 2.5f, width/2f, height/2f) {
+        canvas.withScale(1f, 2f, width/2f, height/2f) {
             drawText(text, width / 2f, baseline, paint)
         }
 

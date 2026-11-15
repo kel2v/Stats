@@ -7,13 +7,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,9 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bytemanager.stats.R
+import com.bytemanager.stats.data.repository.NotificationIconInfoType
 
 @Composable
 fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
@@ -40,6 +46,33 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
     val isCutmullRomCurveEnabled = settingsUiState.isCutmullRomCurveEnabled
     val isIgnoringBatteryOptimizations = settingsUiState.isIgnoringBatteryOptimizations
     val isAutostartLoggingServiceEnabled = settingsUiState.isAutostartLoggingServiceEnabled
+    val selectedNotificationIconInfo = settingsUiState.selectedNotificationIconInfo
+
+    val notificationIconChoices = listOf(
+        RadioGroupChoice(
+            label = "App icon",
+            choiceNumber = NotificationIconInfoType.APP_ICON.ordinal,
+            onClick = {
+                settingsViewModel.setNotificationIconInfoPreference(NotificationIconInfoType.APP_ICON)
+            }
+        ),
+
+        RadioGroupChoice(
+            label = "Battery temperature",
+            choiceNumber = NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal,
+            onClick = {
+                settingsViewModel.setNotificationIconInfoPreference(NotificationIconInfoType.BATTERY_TEMPERATURE)
+            }
+        ),
+
+        RadioGroupChoice(
+            label = "Thermal throttling status",
+            choiceNumber = NotificationIconInfoType.THROTTLING_STATUS.ordinal,
+            onClick = {
+                settingsViewModel.setNotificationIconInfoPreference(NotificationIconInfoType.THROTTLING_STATUS)
+            }
+        )
+    )
 
     Column (
         modifier = Modifier
@@ -185,6 +218,19 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
         }
 
         spacingBetweenPreferenceGroups()
+
+        PreferenceGroup(
+            name = "Miscellaneous"
+        ) {
+            RadioButtonPreference(
+                label = stringResource(R.string.notification_icon_shows_preference),
+                description = stringResource(R.string.notification_icon_shows_preference_description),
+                choices = notificationIconChoices,
+                selectedChoice = notificationIconChoices.find {
+                    it.choiceNumber == selectedNotificationIconInfo
+                }!!
+            )
+        }
     }
 }
 
@@ -241,6 +287,80 @@ fun TogglingPreference(
     Spacer(Modifier.height(10.dp))
 }
 
+data class RadioGroupChoice(
+    val label: String,
+    val choiceNumber: Int,
+    val onClick: () -> Unit,
+)
+
+
+@Composable
+fun RadioButtonPreference(
+    modifier: Modifier = Modifier,
+    label: String,
+    description: String? = null,
+    choices: List<RadioGroupChoice>,
+    selectedChoice: RadioGroupChoice,
+) {
+    OutlinedCard (
+        modifier = modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .selectableGroup()
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            choices.forEachIndexed { index, choice ->
+                Row(
+                    modifier = Modifier
+                        .selectable(
+                            selected = choice.choiceNumber == selectedChoice.choiceNumber,
+                            onClick = choice.onClick,
+                            role = Role.RadioButton
+                        ),
+
+                    verticalAlignment = Alignment.CenterVertically,
+
+                ) {
+                    RadioButton(
+                        selected = choice.choiceNumber == selectedChoice.choiceNumber,
+                        onClick = null
+                    )
+
+                    Spacer(Modifier.width(15.dp))
+
+                    Text(
+                        text = choice.label,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+
+                if(index != choices.lastIndex)
+                    Spacer(Modifier.height(15.dp))
+            }
+
+            if (description != null) {
+                Spacer(Modifier.height(20.dp))
+
+                Text(
+                    text = description,
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun PreferenceGroup(

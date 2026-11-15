@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import com.bytemanager.stats.ApplicationCoroutineScope
+import androidx.datastore.preferences.core.intPreferencesKey
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,6 @@ import javax.inject.Singleton
 @Singleton
 class DataStoreRepository @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    @ApplicationCoroutineScope private val appCoroutineScope: CoroutineScope
 ) {
     private val dataStore = DeviceContextDataStoreProvider.get(appContext)
 
@@ -37,9 +36,10 @@ class DataStoreRepository @Inject constructor(
         val IS_IGNORING_BATTERY_OPTIMIZATIONS = booleanPreferencesKey("is_ignoring_battery_optimizations")
         val IS_AUTOSTART_LOGGING_SERVICE_ENABLED = booleanPreferencesKey("is_autostart_logging_service_enabled")
         val SHOW_GETTING_STARTED = booleanPreferencesKey("show_getting_started")
+        val NOTIFICATION_ICON_INFO_PREFERENCE = intPreferencesKey("notification_icon_info_preference")
     }
 
-    val stateFlowOfSettings: StateFlow<Settings> = dataStore.data.map { preferences ->
+    val flowOfSettings = dataStore.data.map { preferences ->
         val e = Settings(
             isDataLoggingEnabled = preferences[Keys.IS_DATA_LOGGING_ENABLED] ?: false,
             isNotificationsEnabled = preferences[Keys.IS_NOTIFICATIONS_ENABLED] ?: false,
@@ -48,18 +48,22 @@ class DataStoreRepository @Inject constructor(
             isCutmullRomCurveEnabled = preferences[Keys.IS_CUTMULL_ROM_CURVE_ENABLED] ?: true,
             isIgnoringBatteryOptimizations = preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] ?: false,
             isAutostartLoggingServiceEnabled = preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false,
-            showQuickSetup = preferences[Keys.SHOW_GETTING_STARTED] ?: true
+            showQuickSetup = preferences[Keys.SHOW_GETTING_STARTED] ?: true,
+            notificationIconInfoPreference = preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] ?: NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal
         )
 
         Log.d("DataStoreRepository", "emitted new Settings value: $e")
 
         e
+    }
 
-    }.stateIn(
-            scope = appCoroutineScope,
-            started = SharingStarted.WhileSubscribed(5000),
+    fun getStateFlowOfSettings(scope: CoroutineScope): StateFlow<Settings> {
+        return flowOfSettings.stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
             initialValue = Settings()
-    )
+        )
+    }
 
     suspend fun isDataLoggingEnabled(): Boolean {
         return dataStore.data.map {
@@ -184,6 +188,18 @@ class DataStoreRepository @Inject constructor(
             preferences[Keys.SHOW_GETTING_STARTED] ?: true
         }.first()
     }
+
+    suspend fun setNotificationIconInfoPreference(value: NotificationIconInfoType) {
+        dataStore.edit { preferences ->
+            preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] = value.ordinal
+        }
+    }
+
+    suspend fun getNotificationIconInfoPreference(): Int {
+        return dataStore.data.map { preferences ->
+            preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] ?: NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal
+        }.first()
+    }
 }
 
 data class Settings(
@@ -194,8 +210,17 @@ data class Settings(
     val isCutmullRomCurveEnabled: Boolean = true,
     val isIgnoringBatteryOptimizations: Boolean = false,
     val isAutostartLoggingServiceEnabled: Boolean = false,
-    val showQuickSetup: Boolean = false
+    val showQuickSetup: Boolean = false,
+    val notificationIconInfoPreference: Int = NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal,
 )
+
+enum class NotificationIconInfoType {
+    // DO NOT CHANGE THIS ORDER !!!
+
+    APP_ICON,
+    BATTERY_TEMPERATURE,
+    THROTTLING_STATUS,
+}
 
 object DeviceContextDataStoreProvider {
     @Volatile

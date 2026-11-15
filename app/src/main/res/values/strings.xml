@@ -92,6 +92,7 @@ Tap "Confirm" to reset the database."
     <string name="permissions_and_exemptions_preference_group">Permissions and exemptions</string>
     <string name="features_preference_group">Features</string>
     <string name="permissions_preference_group">Permissions</string>
+    <string name="miscellaneous_preference_group">Miscellaneous</string>
 
     <string name="data_logging_preference">Data logging</string>
     <string name="notification_preference">Notifications</string>
@@ -101,6 +102,7 @@ Tap "Confirm" to reset the database."
     <string name="battery_optimizations_exemption_preference">Exemption from battery optimizations</string>
     <string name="autostart_logging_on_boot_preference">Autostart logging on boot</string>
     <string name="manage_database_preference">Manage database</string>
+    <string name="notification_icon_shows_preference">Notification icon shows</string>
 
 
     <string name="moving_average_preference_description">Smooths graph data using a moving average to reduce sharp spikes.</string>
@@ -111,11 +113,15 @@ Tap "Confirm" to reset the database."
     <string name="notification_preference_description">Tap the switch to open notification settings and manage alerts for this app.</string>
     <string name="autostart_logging_on_boot_preference_description">Automatically starts data logging when your device boots up.</string>
     <string name="data_logging_preference_description">Continuous battery updates logging</string>
+    <string name="notification_icon_shows_preference_description">
+        "NT → No throttling\nLT → Light throttling\nMT → Moderate throttling\nST → Severe throttling\nCT → Critical throttling\nE! → EMERGENCY; Key components are shutting\n!! → NEED SHUTDOWN IMMEDIATELY!"
+    </string>
 
 
     <string name="quick_setup_description">Turn on these essential features to get started</string>
 
     <string name="skip_button">Skip</string>
     <string name="done_button">Done</string>
+    <string name="thermal_throttling_label">Thermal throttling</string>
 
 </resources>

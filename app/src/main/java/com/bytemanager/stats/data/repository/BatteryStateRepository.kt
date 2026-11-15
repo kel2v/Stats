@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
-import com.bytemanager.stats.ApplicationCoroutineScope
 import com.bytemanager.stats.data.types.TimestampedBatteryState
 import com.bytemanager.stats.data.types.TimestampedRawBatteryState
 import com.bytemanager.stats.utils.BatteryStateRepositoryUtils
@@ -14,8 +13,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +23,6 @@ import javax.inject.Singleton
 @Singleton
 class BatteryStateRepository @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    @ApplicationCoroutineScope private val scope: CoroutineScope
 ) {
     val flowOfTimestampedRawBatteryState = callbackFlow {
         val receiver = object : BroadcastReceiver() {
@@ -65,7 +64,7 @@ class BatteryStateRepository @Inject constructor(
         }
     }
 
-    val stateFlowOfBatteryTechnology = callbackFlow {
+    val flowOfBatteryTechnology = callbackFlow {
         val receiver = object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if(context != null && intent != null) {
@@ -83,18 +82,33 @@ class BatteryStateRepository @Inject constructor(
         awaitClose {
             appContext.unregisterReceiver(receiver)
         }
-    }.stateIn(
-        scope = scope,
-        started = SharingStarted.Eagerly,
-        initialValue = "-"
-    )
-    val stateFlowOfTimestampedBatteryState = flowOfTimestampedRawBatteryState
-        .map {
-            BatteryStateRepositoryUtils.convertTimestampedBatteryStateToBatteryState(it)
-        }
-        .stateIn(
+    }
+
+    val flowOfTimestampedBatteryState = combine(
+        flowOfTimestampedRawBatteryState,
+        flowOfBatteryTechnology
+    ) { timestampedRawBatteryState, batteryTechnology ->
+        BatteryStateRepositoryUtils.createTimestampedBatteryState(
+            timestampedRawBatteryState,
+            batteryTechnology
+        )
+    }
+
+    fun getStateFlowOfTimestampedBatteryState(
+        scope: CoroutineScope
+    ): StateFlow<TimestampedBatteryState> {
+        return combine(
+            flowOfTimestampedRawBatteryState,
+            flowOfBatteryTechnology,
+        ) { timestampedRawBatteryState, batteryTechnology ->
+            BatteryStateRepositoryUtils.createTimestampedBatteryState(
+                timestampedRawBatteryState,
+                batteryTechnology
+            )
+        }.stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
             initialValue = TimestampedBatteryState()
         )
+    }
 }

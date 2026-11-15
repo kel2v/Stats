@@ -1,6 +1,5 @@
 package com.bytemanager.stats.ui.pages
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,14 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bytemanager.stats.R
 import com.bytemanager.stats.ui.listitem.ListItem
+import com.bytemanager.stats.utils.BatteryStateRepositoryUtils
+import com.bytemanager.stats.utils.ThermalStateRepositoryUtils
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun Battery(
     batteryViewModel: BatteryViewModel = hiltViewModel(),
@@ -31,9 +30,8 @@ fun Battery(
 ) {
     val batteryUiState by batteryViewModel.stateFlowOfBatteryUiState.collectAsState()
 
-    val batteryState = batteryUiState.timestampedBatteryState
-    val batteryTechnology = batteryUiState.batteryTechnology
-    val isFahrenheit = batteryUiState.isFahrenheit
+    val batteryStateVerbose = batteryUiState.timestampedBatteryState
+    val thermalState = batteryUiState.timestampedThermalState
 
     Column(
         Modifier
@@ -46,51 +44,35 @@ fun Battery(
 
         ListItem(
             parameterName = stringResource(R.string.battery_type_label),
-            parameterValue = batteryTechnology,
+            parameterValue = batteryStateVerbose.technology,
         )
         ListItem(
             parameterName = stringResource(R.string.battery_health_label),
-            parameterValue = batteryState.batteryHealth?:"-",
+            parameterValue = batteryStateVerbose.batteryHealth,
         )
         ListItem(
             parameterName = stringResource(R.string.charging_status_label),
-            parameterValue = batteryState.chargingStatus?:"-",
+            parameterValue = batteryStateVerbose.chargingStatus,
         )
 
         ListItem(
             parameterName = stringResource(R.string.battery_level_label),
-            parameterValue = "${batteryState.level?:"-"}%",
+            parameterValue = BatteryStateRepositoryUtils.getBatteryLevelPercentageVerbose(batteryStateVerbose),
         )
 
-        val voltValue = when {
-            batteryState.voltage == null -> "-"
-            else -> String.format(
-                locale = LocalLocale.current.platformLocale,
-                format = "%.3f",
-                batteryState.voltage
-            )
-        }
         ListItem(
             parameterName = stringResource(R.string.battery_voltage_label),
-            parameterValue = "$voltValue V",
+            parameterValue = BatteryStateRepositoryUtils.getVoltageVerbose(batteryStateVerbose),
         )
 
-        val tempValue = when {
-            batteryState.temperature == null -> "-"
-            isFahrenheit -> String.format(
-                locale = LocalLocale.current.platformLocale,
-                format = "%.1f",
-                (batteryState.temperature * 1.8f) + 32
-            )
-            else -> String.format(
-                locale = LocalLocale.current.platformLocale,
-                format = "%.1f",
-                batteryState.temperature
-            )
-        }
         ListItem(
             parameterName = stringResource(R.string.battery_temperature_label),
-            parameterValue = "$tempValue °${if(isFahrenheit) "F" else "C"}",
+            parameterValue = BatteryStateRepositoryUtils.getTemperatureVerbose(batteryStateVerbose, batteryUiState.isFahrenheit),
+        )
+
+        ListItem(
+            parameterName = stringResource(R.string.thermal_throttling_label),
+            parameterValue = ThermalStateRepositoryUtils.getThermalThrottlingStatusVerbose(thermalState.throttlingStatus),
         )
 
         Spacer(Modifier.height(40.dp))

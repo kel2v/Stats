@@ -1,0 +1,57 @@
+<!-- res/drawable/ic_stat_battery_trend.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <group
+        android:scaleX="1.4"
+        android:scaleY="1.4"
+        android:pivotX="11"
+        android:pivotY="11"
+        android:translateX="1"
+        android:translateY="1">
+
+        <!-- Battery body -->
+        <path
+            android:pathData="M8,6 H14 V16 H8 Z"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1.2"
+            android:strokeLineJoin="round" />
+
+        <!-- Battery terminal -->
+        <path
+            android:pathData="M10,4 H12 V5.6 H10 Z"
+            android:fillColor="#FFFFFFFF" />
+
+        <!-- Charge level -->
+        <path
+            android:pathData="M9.5,8.5 H12.5 V14 H9.5 Z"
+            android:fillColor="#FFFFFFFF" />
+
+        <!-- Left curves -->
+        <path
+            android:pathData="M1,7 Q3.5,4.5 6,8"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M1,13 Q3.5,10 6,12"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1"
+            android:strokeLineCap="round" />
+
+        <!-- Right curves -->
+        <path
+            android:pathData="M16,9 Q18.5,6.5 21,10"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M16,14 Q18.5,11.5 21,14"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1"
+            android:strokeLineCap="round" />
+    </group>
+</vector>

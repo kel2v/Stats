@@ -9,6 +9,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.bytemanager.stats.data.repository.BatteryStateRepository
+import com.bytemanager.stats.data.repository.DataStoreRepository
+import com.bytemanager.stats.data.repository.ThermalStateRepository
 import com.bytemanager.stats.utils.ErrorHandler
 import com.bytemanager.stats.utils.StatsLogger
 import com.bytemanager.stats.utils.StatsNotificationManager
@@ -38,6 +40,12 @@ class StatsLoggingService: Service() {
     @Inject
     lateinit var batteryStateRepository: BatteryStateRepository
 
+    @Inject
+    lateinit var dataStoreRepository: DataStoreRepository
+
+    @Inject
+    lateinit var thermalStateRepository: ThermalStateRepository
+
     private lateinit var scope: CoroutineScope
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -50,9 +58,17 @@ class StatsLoggingService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         StatsNotificationManager.createStatsNotificationChannel(applicationContext)
+
+        val timestampedBatteryState = batteryStateRepository.getStateFlowOfTimestampedBatteryState(scope).value
+        val timestampedPowerState = thermalStateRepository.getStateFlowOfTimestampedThermalState(scope).value
+        val settings = dataStoreRepository.getStateFlowOfSettings(scope).value
+
         val notification = StatsNotificationManager.buildStatsNotification(
-            applicationContext,
-            batteryStateRepository.stateFlowOfTimestampedBatteryState.value,
+            appContext = applicationContext,
+            timestampedBatteryState = timestampedBatteryState,
+            throttlingStatus = timestampedPowerState.throttlingStatus,
+            notificationIconInfoPreference = settings.notificationIconInfoPreference,
+            isFahrenheit = settings.isFahrenheit
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(

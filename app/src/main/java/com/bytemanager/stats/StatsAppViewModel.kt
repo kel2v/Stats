@@ -14,7 +14,7 @@ import javax.inject.Inject
 class StatsAppViewModel @Inject constructor(
     dataStoreRepository: DataStoreRepository,
 ): ViewModel() {
-    val stateFlowOfStatsAppUiState: StateFlow<StatsAppUiState> = dataStoreRepository.stateFlowOfSettings.map { settings ->
+    val stateFlowOfStatsAppUiState: StateFlow<StatsAppUiState> = dataStoreRepository.flowOfSettings.map { settings ->
         StatsAppUiState(
             showQuickSetup = settings.showQuickSetup
         )

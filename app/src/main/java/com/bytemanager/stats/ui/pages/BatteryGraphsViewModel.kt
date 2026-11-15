@@ -12,6 +12,7 @@ import com.bytemanager.stats.data.types.TimestampedBatteryVoltage
 import com.bytemanager.stats.data.types.convertToTimestampedBatteryLevel
 import com.bytemanager.stats.data.types.convertToTimestampedBatteryTemp
 import com.bytemanager.stats.data.types.convertToTimestampedBatteryVoltage
+import com.bytemanager.stats.utils.BatteryStateRepositoryUtils
 import com.bytemanager.stats.utils.StatsTimeUtils
 import com.patrykandpatrick.vico.compose.cartesian.VicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.VicoZoomState
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
@@ -37,12 +39,14 @@ class BatteryGraphsViewModel  @Inject constructor(
     private val _graphUiState = MutableStateFlow(GraphUiState())
     val graphUiState = _graphUiState.asStateFlow()
 
+    val stateFlowOfSettings = dataStoreRepository.getStateFlowOfSettings(viewModelScope)
+
     val stateFlowOfGraphData = combine(
         graphUiState,
-        timestampedBatteryStatesDbRepository.stateFlowOfTemperatureGlobalMin,
-        timestampedBatteryStatesDbRepository.stateFlowOfTemperatureGlobalMax,
-        timestampedBatteryStatesDbRepository.stateFlowOfVoltageGlobalMin,
-        timestampedBatteryStatesDbRepository.stateFlowOfVoltageGlobalMax,
+        timestampedBatteryStatesDbRepository.dbDao.globalMinOfTemperature().map { BatteryStateRepositoryUtils.getTemperatureInCelsius(it) },
+        timestampedBatteryStatesDbRepository.dbDao.globalMaxOfTemperature().map { BatteryStateRepositoryUtils.getTemperatureInCelsius(it) },
+        timestampedBatteryStatesDbRepository.dbDao.globalMinOfVoltage().map { BatteryStateRepositoryUtils.getVoltage(it) },
+        timestampedBatteryStatesDbRepository.dbDao.globalMaxOfVoltage().map { BatteryStateRepositoryUtils.getVoltage(it) },
     ) {
         uiState,
         globalMinOfTemperature,
@@ -96,7 +100,7 @@ class BatteryGraphsViewModel  @Inject constructor(
                     )
                 }
 
-        val isFahrenheit = dataStoreRepository.stateFlowOfSettings.value.isFahrenheit
+        val isFahrenheit = stateFlowOfSettings.value.isFahrenheit
 
         GraphData(
             graphDataOfLevel = GraphDataOfLevel(
@@ -118,7 +122,7 @@ class BatteryGraphsViewModel  @Inject constructor(
             isFahrenheit = isFahrenheit
         )
     }
-        .combine(dataStoreRepository.stateFlowOfSettings) { graphData, settings ->
+        .combine(stateFlowOfSettings) { graphData, settings ->
             graphData.copy(
                 isFahrenheit = settings.isFahrenheit,
                 isMovingAverageForVoltageGraphEnabled = settings.isMovingAverageForVoltageGraphEnabled,

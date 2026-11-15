@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bytemanager.stats.data.repository.BatteryStateRepository
 import com.bytemanager.stats.data.repository.DataStoreRepository
+import com.bytemanager.stats.data.repository.ThermalStateRepository
 import com.bytemanager.stats.data.types.TimestampedBatteryState
+import com.bytemanager.stats.data.types.TimestampedThermalState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,20 +18,23 @@ import javax.inject.Inject
 class BatteryViewModel @Inject constructor(
     batteryStateRepository: BatteryStateRepository,
     dataStoreRepository: DataStoreRepository,
+    thermalStateRepository: ThermalStateRepository,
 ) : ViewModel() {
     val stateFlowOfBatteryUiState: StateFlow<BatteryUiState> = combine(
-        batteryStateRepository.stateFlowOfTimestampedBatteryState,
-        dataStoreRepository.stateFlowOfSettings,
-        batteryStateRepository.stateFlowOfBatteryTechnology,
-    ) { timestampedBatteryState, settings, batteryTechnology, ->
+        batteryStateRepository.flowOfTimestampedBatteryState,
+        dataStoreRepository.flowOfSettings,
+        thermalStateRepository.flowOfTimestampedThermalState,
+    ) { timestampedBatteryState, settings, timestampedThermalState ->
+
         BatteryUiState(
             timestampedBatteryState = timestampedBatteryState,
-            batteryTechnology = batteryTechnology,
-            isFahrenheit = settings.isFahrenheit,
+            timestampedThermalState = timestampedThermalState,
+            isFahrenheit = settings.isFahrenheit
         )
+
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = BatteryUiState()
     )
 }
@@ -37,6 +42,6 @@ class BatteryViewModel @Inject constructor(
 
 data class BatteryUiState(
     val timestampedBatteryState: TimestampedBatteryState = TimestampedBatteryState(),
-    val batteryTechnology: String = "null",
+    val timestampedThermalState: TimestampedThermalState = TimestampedThermalState(0),
     val isFahrenheit: Boolean = false,
 )

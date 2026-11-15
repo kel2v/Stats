@@ -22,7 +22,7 @@ class QuickSetupViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val dataStoreRepository: DataStoreRepository,
 ): ViewModel() {
-    val stateFlowOfQuickSetupUiState: StateFlow<QuickSetupUiState> = dataStoreRepository.stateFlowOfSettings.map { settings ->
+    val stateFlowOfQuickSetupUiState: StateFlow<QuickSetupUiState> = dataStoreRepository.flowOfSettings.map { settings ->
         QuickSetupUiState(
             isNotificationsEnabled = settings.isNotificationsEnabled,
             isDataLoggingEnabled = settings.isDataLoggingEnabled,
@@ -57,7 +57,7 @@ class QuickSetupViewModel @Inject constructor(
         viewModelScope.launch {
             dataStoreRepository.toggleDataLogging()
 
-            if(dataStoreRepository.stateFlowOfSettings.value.isDataLoggingEnabled) {
+            if(stateFlowOfQuickSetupUiState.value.isDataLoggingEnabled) {
                 StatsLoggingService.startForegroundService(appContext)
             } else {
                 StatsLoggingService.stopService(appContext)

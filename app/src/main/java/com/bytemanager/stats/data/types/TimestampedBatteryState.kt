@@ -5,7 +5,7 @@ data class TimestampedBatteryState(
     val level: Int? = null,
     val voltage: Float? = null,
     val temperature: Float? = null,
-    val chargingStatus: String? = null,
-    val batteryHealth: String? = null,
-    val technology: String? = null,
+    val chargingStatus: String = "-",
+    val batteryHealth: String = "-",
+    val technology: String = "-",
 )
