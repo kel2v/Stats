@@ -1,37 +1,37 @@
-INTRODUCTION
+Introduction
 ---
-Stats puts your phone's battery status on one clear screen and, if you choose, keeps a history of it so you can see how your battery level, voltage and temperature change through the day, through out the year. No account needed, no ads, and no internet connection required.
+Stats displays all key telemetry of your phone's battery status on one screen and, if you choose, keeps a history of it so you can see how your battery level, voltage and temperature change through the day, through out the year. No account needed, no ads, and no internet connection required.
 
-WHAT YOU CAN SEE
+What you can see
 ---
 * Battery level (%), voltage (V) and temperature (°C or °F)
 * Device's thermal throttling status
 * Charging status, battery health status and battery technology information
 * The latest readings, right on the home screen and in your notifications panel
 
-OPTIONAL BATTERY INFO LOGGING
+Optional battery info logging
 ---
 Switch on battery info logging to build your battery's history. It is off by default and only runs when you turn it on. While it is on, Stats saves readings from Android's battery updates (time, battery level, voltage, temperature, charging status and health status) to a database on your device.
 
-LATEST BATTERY INFO AS A NOTIFICATION
+Latest battery info as notification
 ---
 If battery info logging is enabled, Stats will show your latest battery level, temperature, voltage and thermal throttling status in a notification
 
-CUSTOMIZABLE STATUS BAR ICON
+Customizable status bar icon
 ---
 Users can customize their status bar icon to show either the latest battery temperature or thermal throttling status so user can read it without opening the notification panel. It needs battery info logging to be turned on.
 
-DAY-WISE GRAPHS
+24-hour graphs
 ---
 Browse your logged battery history as day-by-day, 24-hour graphs of battery level, temperature and voltage.
 
-YOUR DATA, YOUR CONTROL
+Your data, your control
 ---
 * Your battery history is stored ONLY on your device
 * Export your log, import one back, or reset it whenever you like
 * Stats doesn't collect analytics or app-usage data, and it doesn't ask for personal information
 
-IMAGES
+Screenshots of the app
 ---
 <img width="250" alt="Screenshot of the Stats app's battery info dashboard page" src="https://github.com/user-attachments/assets/5684ebfd-07d0-4c3c-8ecb-217c36612287" />
 <img width="250" alt="Screenshot of the Stats app's 24-hour graph showing battery level" src="https://github.com/user-attachments/assets/a75d2d37-9676-43e3-914c-bb41d7d899d0" />
