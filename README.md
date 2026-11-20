@@ -27,9 +27,9 @@ Browse your logged battery history as day-by-day, 24-hour graphs of battery leve
 
 YOUR DATA, YOUR CONTROL
 ---
-• Your battery history is stored ONLY on your device
-• Export your log, import one back, or reset it whenever you like
-• Stats doesn't collect analytics or app-usage data, and it doesn't ask for personal information
+* Your battery history is stored ONLY on your device
+* Export your log, import one back, or reset it whenever you like
+* Stats doesn't collect analytics or app-usage data, and it doesn't ask for personal information
 
 IMAGES
 ---
