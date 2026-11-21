@@ -31,7 +31,7 @@ class BatteryStateRepository @Inject constructor(
 
                 val statsTimeUtils = StatsTimeUtils()
 
-                val timestamp = statsTimeUtils.nowInTimestamp()
+                val timestamp = statsTimeUtils.currentEpochSecond()
                 val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, Int.MIN_VALUE)
                 val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, Int.MIN_VALUE)
                 val voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, Int.MIN_VALUE)

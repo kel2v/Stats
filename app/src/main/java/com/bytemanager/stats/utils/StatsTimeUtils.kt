@@ -5,69 +5,63 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.getSelectedEndDate
 import androidx.compose.material3.getSelectedStartDate
 import com.bytemanager.stats.data.types.TimestampInterval
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneId
 import java.util.Calendar
 import java.util.TimeZone
 
-class StatsTimeUtils(val zoneId: ZoneId = ZoneId.systemDefault()) {
-    fun localDayToTimestampInterval(localDate: LocalDate): TimestampInterval {
-        val startTimestamp = localDate.atStartOfDay(zoneId).toEpochSecond()
-        val endTimestamp = localDate.plusDays(1).atStartOfDay(zoneId).toEpochSecond()
-
-        return TimestampInterval(startTimestamp, endTimestamp)
+class StatsTimeUtils(
+    private val clock: Clock = Clock.systemDefaultZone()
+) {
+    fun currentEpochSecond(): Long {
+        return Instant.now(clock).epochSecond
     }
 
-    fun nowInTimestamp(): Long {
-        return Instant.now().atZone(zoneId).toEpochSecond()
+    fun currentTime(): LocalTime {
+        return LocalTime.now(clock)
     }
 
-    fun nowInLocalTime(): LocalTime {
-        return Instant.now().atZone(zoneId).toLocalTime()
+    fun currentDate(): LocalDate {
+        return LocalDate.now(clock)
     }
 
-    fun today(): LocalDate {
-        val now = Instant.now().atZone(zoneId)
-        val year = now.year
-        val month = now.month
-        val day = now.dayOfMonth
-
-        return LocalDate.of(year, month, day)
-    }
-
-    fun millisToLocalDate(millis: Long?): LocalDate? {
+    fun epochMillisToLocalDate(millis: Long?): LocalDate? {
         if(millis == null) {
             return null
         }
 
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId))
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone(clock.zone))
         calendar.timeInMillis = millis
 
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-
-        return LocalDate.of(year, month+1, dayOfMonth)
+        return calendar.toInstant().atZone(clock.zone).toLocalDate()
     }
 
     fun localDateToStartOfTheDayInEpochSeconds(localDate: LocalDate): Long {
-        val result = localDate.atStartOfDay(zoneId).toEpochSecond()
+        return localDate.atStartOfDay(clock.zone).toEpochSecond()
+    }
 
-        return result
+    fun localDateToTimestampInterval(localDate: LocalDate): TimestampInterval {
+        val startTimestamp = localDate.atStartOfDay(clock.zone).toEpochSecond()
+        val endTimestamp = localDate.plusDays(1).atStartOfDay(clock.zone).toEpochSecond()
+
+        return TimestampInterval(startTimestamp, endTimestamp)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    fun convertDateRangeToTimestampInterval(dateRangePickerState: DateRangePickerState): TimestampInterval? {
+    fun dateRangeToTimestampInterval(dateRangePickerState: DateRangePickerState): TimestampInterval? {
         val startLocalDate = dateRangePickerState.getSelectedStartDate()
         val endLocalDate = dateRangePickerState.getSelectedEndDate()
 
         var extractedTimestampInterval: TimestampInterval? = null
         if(startLocalDate != null && endLocalDate != null) {
+            val timestampIntervalOfStartDate = localDateToTimestampInterval(startLocalDate)
+            val timestampIntervalOfEndDate = localDateToTimestampInterval(endLocalDate)
+
             extractedTimestampInterval = TimestampInterval(
-                localDateToStartOfTheDayInEpochSeconds(startLocalDate),
-                localDateToStartOfTheDayInEpochSeconds(endLocalDate) + 86400
+                timestampIntervalOfStartDate.startTimestamp,
+                timestampIntervalOfEndDate.endTimestamp
             )
         }
 

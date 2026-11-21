@@ -141,12 +141,12 @@ class ExportFormViewModel @Inject constructor(
         dateRangePickerState: DateRangePickerState
     ) {
         viewModelScope.launch {
-            val extractedTimestampInterval = StatsTimeUtils().convertDateRangeToTimestampInterval(dateRangePickerState)
+            val extractedTimestampInterval = StatsTimeUtils().dateRangeToTimestampInterval(dateRangePickerState)
 
             if(extractedTimestampInterval != null) {
                 val statsTimeUtils = StatsTimeUtils()
-                val startLocalDate = statsTimeUtils.millisToLocalDate(extractedTimestampInterval.startTimestamp * 1000)
-                val endLocalDate = statsTimeUtils.millisToLocalDate(((extractedTimestampInterval.endTimestamp - 1) * 1000))
+                val startLocalDate = statsTimeUtils.epochMillisToLocalDate(extractedTimestampInterval.startTimestamp * 1000)
+                val endLocalDate = statsTimeUtils.epochMillisToLocalDate(((extractedTimestampInterval.endTimestamp - 1) * 1000))
 
                 val uri = createUri(appContext,"${appContext.packageName.toString().substring(startIndex = 4)}__${startLocalDate}__to__${endLocalDate}__at__${Instant.now().epochSecond}")
                 if(uri == null) {

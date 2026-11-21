@@ -1,5 +1,8 @@
 package com.bytemanager.stats.services.notification
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -7,10 +10,10 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.bytemanager.stats.data.repository.BatteryStateRepository
-import com.bytemanager.stats.data.repository.DataStoreRepository
-import com.bytemanager.stats.data.repository.ThermalStateRepository
+import com.bytemanager.stats.MainActivity
+import com.bytemanager.stats.R
 import com.bytemanager.stats.utils.ErrorHandler
 import com.bytemanager.stats.utils.StatsLogger
 import com.bytemanager.stats.utils.StatsNotificationManager
@@ -37,15 +40,6 @@ class StatsLoggingService: Service() {
 
     private val mutex = Mutex()
 
-    @Inject
-    lateinit var batteryStateRepository: BatteryStateRepository
-
-    @Inject
-    lateinit var dataStoreRepository: DataStoreRepository
-
-    @Inject
-    lateinit var thermalStateRepository: ThermalStateRepository
-
     private lateinit var scope: CoroutineScope
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -57,27 +51,37 @@ class StatsLoggingService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        StatsNotificationManager.createStatsNotificationChannel(applicationContext)
-
-        val timestampedBatteryState = batteryStateRepository.getStateFlowOfTimestampedBatteryState(scope).value
-        val timestampedPowerState = thermalStateRepository.getStateFlowOfTimestampedThermalState(scope).value
-        val settings = dataStoreRepository.getStateFlowOfSettings(scope).value
-
-        val notification = StatsNotificationManager.buildStatsNotification(
-            appContext = applicationContext,
-            timestampedBatteryState = timestampedBatteryState,
-            throttlingStatus = timestampedPowerState.throttlingStatus,
-            notificationIconInfoPreference = settings.notificationIconInfoPreference,
-            isFahrenheit = settings.isFahrenheit
+        val channel = NotificationChannel(
+            "startForeground",
+            "Miscellaneous",
+            NotificationManager.IMPORTANCE_LOW
         )
+
+        val notificationManager = applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+
+        val notification = NotificationCompat.Builder(applicationContext, "startForeground")
+            .setContentTitle("'Battery info logger' is running")
+            .setOngoing(true)
+            .setSmallIcon(R.drawable.status_bar_icon)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    Intent(applicationContext, MainActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            .build()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
-                1,
+                2,
                 notification,
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             )
         } else {
-            startForeground(1, notification)
+            startForeground(2, notification)
         }
 
 

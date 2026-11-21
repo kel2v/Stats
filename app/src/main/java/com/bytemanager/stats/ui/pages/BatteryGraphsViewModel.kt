@@ -3,45 +3,53 @@ package com.bytemanager.stats.ui.pages
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bytemanager.stats.data.repository.DataStoreRepository
+import com.bytemanager.stats.data.repository.Settings
 import com.bytemanager.stats.data.repository.TimestampedBatteryStatesDbRepository
 import com.bytemanager.stats.data.types.GraphInterval
 import com.bytemanager.stats.data.types.GraphType
-import com.bytemanager.stats.data.types.TimestampedBatteryLevel
-import com.bytemanager.stats.data.types.TimestampedBatteryTemp
-import com.bytemanager.stats.data.types.TimestampedBatteryVoltage
-import com.bytemanager.stats.data.types.convertToTimestampedBatteryLevel
-import com.bytemanager.stats.data.types.convertToTimestampedBatteryTemp
-import com.bytemanager.stats.data.types.convertToTimestampedBatteryVoltage
+import com.bytemanager.stats.data.types.TimestampedBatteryState
 import com.bytemanager.stats.utils.BatteryStateRepositoryUtils
 import com.bytemanager.stats.utils.StatsTimeUtils
 import com.patrykandpatrick.vico.compose.cartesian.VicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.VicoZoomState
 import com.patrykandpatrick.vico.compose.cartesian.Zoom
+import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @HiltViewModel
 class BatteryGraphsViewModel  @Inject constructor(
     timestampedBatteryStatesDbRepository: TimestampedBatteryStatesDbRepository,
     dataStoreRepository: DataStoreRepository
 ): ViewModel() {
-    private val dbDao = timestampedBatteryStatesDbRepository.dbDao
+    private data class CombinedData(
+        val listOfTimestampedBatteryState: List<TimestampedBatteryState> = emptyList(),
+
+        val globalMinOfVoltage: Float? = null,
+        val globalMaxOfVoltage: Float? = null,
+
+        val globalMinOfTemperature: Float? = null,
+        val globalMaxOfTemperature: Float? = null,
+
+        val settings: Settings = Settings(),
+    )
 
     private val _graphUiState = MutableStateFlow(GraphUiState())
     val graphUiState = _graphUiState.asStateFlow()
 
-    val stateFlowOfSettings = dataStoreRepository.getStateFlowOfSettings(viewModelScope)
-
-    val stateFlowOfGraphData = combine(
+    private val flowOfCombinedData = combine(
         graphUiState,
         timestampedBatteryStatesDbRepository.dbDao.globalMinOfTemperature().map { BatteryStateRepositoryUtils.getTemperatureInCelsius(it) },
         timestampedBatteryStatesDbRepository.dbDao.globalMaxOfTemperature().map { BatteryStateRepositoryUtils.getTemperatureInCelsius(it) },
@@ -55,88 +63,167 @@ class BatteryGraphsViewModel  @Inject constructor(
         globalMaxOfVoltage ->
 
         val date = uiState.dateSelected
-        val timestampRange = StatsTimeUtils().localDayToTimestampInterval(date)
+        val timestampRange = StatsTimeUtils().localDateToTimestampInterval(date)
         val startTimestampOfTheDate = StatsTimeUtils().localDateToStartOfTheDayInEpochSeconds(date)
 
-        val listOfTimestampedBatteryTemp =
-            dbDao.getListOfTimestampedRawBatteryTempFromTimestampRange(
+
+
+        CombinedData(
+            listOfTimestampedBatteryState = timestampedBatteryStatesDbRepository.dbDao.getFromTimestampRange(
                 timestampRange.startTimestamp,
                 timestampRange.endTimestamp
             )
                 .first()
-                .mapNotNull { item ->
-                    item.convertToTimestampedBatteryTemp()
-                }.map { item ->
-                    item.copy(
-                        timestamp = item.timestamp - startTimestampOfTheDate
+                .map {
+                    val timestampedBatteryState = BatteryStateRepositoryUtils.createTimestampedBatteryState(it, "-")
+                    timestampedBatteryState.copy(
+                        timestamp = it.timestamp - startTimestampOfTheDate
                     )
-                }
+                },
 
-        val listOfTimestampedBatteryVoltage =
-            dbDao.getListOfTimestampedRawBatteryVoltageFromTimestampRange(
-                timestampRange.startTimestamp,
-                timestampRange.endTimestamp
-            )
-                .first()
-                .mapNotNull { item ->
-                    item.convertToTimestampedBatteryVoltage()
-                }.map { item ->
-                    item.copy(
-                        timestamp = item.timestamp - startTimestampOfTheDate
-                    )
-                }
+            globalMinOfVoltage = globalMinOfVoltage,
+            globalMaxOfVoltage = globalMaxOfVoltage,
 
-        val listOfTimestampedBatteryLevel =
-            dbDao.getListOfTimestampedRawBatteryLevelFromTimestampRange(
-                timestampRange.startTimestamp,
-                timestampRange.endTimestamp
-            )
-                .first()
-                .mapNotNull { item ->
-                    item.convertToTimestampedBatteryLevel()
-                }.map { item ->
-                    item.copy(
-                        timestamp = item.timestamp - startTimestampOfTheDate
-                    )
-                }
+            globalMinOfTemperature = globalMinOfTemperature,
+            globalMaxOfTemperature = globalMaxOfTemperature,
+        )
+    }.combine(
+        dataStoreRepository.flowOfSettings
+    ) { combinedData, settings ->
 
-        val isFahrenheit = stateFlowOfSettings.value.isFahrenheit
-
-        GraphData(
-            graphDataOfLevel = GraphDataOfLevel(
-                listOfTimestampedBatteryLevel = listOfTimestampedBatteryLevel,
-            ),
-
-            graphDataOfVoltage = GraphDataOfVoltage(
-                listOfTimestampedBatteryVoltage = listOfTimestampedBatteryVoltage,
-                globalMinOfVoltage = globalMinOfVoltage,
-                globalMaxOfVoltage = globalMaxOfVoltage
-            ),
-
-            graphDataOfTemperature = GraphDataOfTemperature(
-                listOfTimestampedBatteryTemp = listOfTimestampedBatteryTemp,
-                globalMinOfTemperature = globalMinOfTemperature,
-                globalMaxOfTemperature = globalMaxOfTemperature
-            ),
-
-            isFahrenheit = isFahrenheit
+        combinedData.copy(
+            settings = settings
         )
     }
-        .combine(stateFlowOfSettings) { graphData, settings ->
-            graphData.copy(
-                isFahrenheit = settings.isFahrenheit,
-                isMovingAverageForVoltageGraphEnabled = settings.isMovingAverageForVoltageGraphEnabled,
-                isCutmullRomCurveEnabled = settings.isCutmullRomCurveEnabled
-            )
+
+    init {
+        viewModelScope.launch {
+            flowOfCombinedData.collectLatest { combinedData ->
+                _graphUiState.update { current ->
+                    val graphsData = getGraphsData(combinedData)
+                    current.copy(
+                        graphsData = graphsData,
+                    )
+                }
+            }
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = GraphData()
+    }
+
+    private fun getGraphsData(combinedData: CombinedData): GraphsData {
+        val listOfTimestamps: List<Float> = combinedData.listOfTimestampedBatteryState
+            .mapNotNull { it.timestamp?.toFloat() }
+
+        val listOfBatteryLevels: List<Float> = combinedData.listOfTimestampedBatteryState
+            .mapNotNull { it.level?.toFloat() }
+            .transformIf(combinedData.settings.isMovingAverageForVoltageGraphEnabled) {
+                applyMovingAverageTransform(it)
+            }
+
+        val listOfBatteryVoltages: List<Float> = combinedData.listOfTimestampedBatteryState
+            .mapNotNull { it.voltage }
+            .transformIf(combinedData.settings.isMovingAverageForVoltageGraphEnabled) {
+                applyMovingAverageTransform(it)
+            }
+
+        val listOfBatteryTemps: List<Float> = combinedData.listOfTimestampedBatteryState
+            .mapNotNull { it.temperature }
+            .transformIf(combinedData.settings.isMovingAverageForVoltageGraphEnabled) {
+                applyMovingAverageTransform(it)
+            }
+            .transformIf(combinedData.settings.isFahrenheit) { list ->
+                list.map {
+                    BatteryStateRepositoryUtils.convertCelsiusToFahrenheits(it)
+                }
+            }
+
+
+        val yStepOfVoltage = 0.1
+        val yStepOfTemperature = if(combinedData.settings.isFahrenheit) 10.0 else 5.0
+
+        val globalMinOfTemp = combinedData.globalMinOfTemperature?.transformIf(combinedData.settings.isFahrenheit) {
+            BatteryStateRepositoryUtils.convertCelsiusToFahrenheits(it)
+        }
+
+        val globalMaxOfTemp = combinedData.globalMaxOfTemperature?.transformIf(combinedData.settings.isFahrenheit) {
+            BatteryStateRepositoryUtils.convertCelsiusToFahrenheits(it)
+        }
+
+        val interpolator = if(combinedData.settings.isCutmullRomCurveEnabled) {
+            LineCartesianLayer.Interpolator.catmullRom()
+        } else {
+            LineCartesianLayer.Interpolator.Sharp
+        }
+
+        val bottomAxisValueFormatter = { value: Double ->
+            "${(value/3600).toInt()}:00"
+        }
+
+        return GraphsData(
+            graphDataOfLevel = GraphData(
+                graphType = GraphType.LEVEL,
+
+                listOfTimestamps = listOfTimestamps,
+                listOfValues = listOfBatteryLevels,
+
+                yStep = 5.0,
+
+                minY = 0.0,
+                maxY = 100.0,
+
+                startAxisValueFormatter = { value: Double ->
+                    "${value.toInt()} %"
+                },
+                bottomAxisValueFormatter = bottomAxisValueFormatter,
+
+                interpolator = interpolator
+            ),
+
+
+            graphDataOfVoltage = GraphData(
+                graphType = GraphType.VOLTAGE,
+
+                listOfTimestamps = listOfTimestamps,
+                listOfValues = listOfBatteryVoltages,
+
+                yStep = yStepOfVoltage,
+
+                minY = calculateMinY(combinedData.globalMinOfVoltage, yStepOfVoltage),
+                maxY = calculateMaxY(combinedData.globalMaxOfVoltage, yStepOfVoltage),
+
+                startAxisValueFormatter = { value: Double ->
+                    "${
+                        String.format(
+                            locale = Locale.getDefault(),
+                            format = "%.1f",
+                            value
+                        )
+                    } V"
+                },
+                bottomAxisValueFormatter = bottomAxisValueFormatter,
+
+                interpolator = interpolator
+            ),
+
+            graphDataOfTemperature = GraphData(
+                graphType = GraphType.TEMPERATURE,
+
+                listOfTimestamps = listOfTimestamps,
+                listOfValues = listOfBatteryTemps,
+
+                yStep = yStepOfTemperature,
+
+                minY = calculateMinY(globalMinOfTemp, yStepOfTemperature),
+                maxY = calculateMaxY(globalMaxOfTemp, yStepOfTemperature),
+
+                startAxisValueFormatter = { value: Double ->
+                    "${value.toInt()} °${if(combinedData.settings.isFahrenheit)"F" else "C"}"
+                },
+                bottomAxisValueFormatter = bottomAxisValueFormatter,
+
+                interpolator = interpolator
+            ),
         )
-
-
-
+    }
 
 
 
@@ -191,7 +278,7 @@ class BatteryGraphsViewModel  @Inject constructor(
     private fun extractSelectedDate(millis: Long?) {
         _graphUiState.update { current ->
             current.copy(
-                dateSelected =  StatsTimeUtils().millisToLocalDate(millis) ?: StatsTimeUtils().today()
+                dateSelected =  StatsTimeUtils().epochMillisToLocalDate(millis) ?: StatsTimeUtils().currentDate()
             )
         }
     }
@@ -215,17 +302,48 @@ class BatteryGraphsViewModel  @Inject constructor(
             }
         }
     }
+
+    fun calculateMinY(minValue: Float?, yStep: Double): Double? {
+        minValue ?: return null
+        return floor(minValue / yStep) * yStep - if (floor(minValue / yStep) == minValue / yStep) yStep else 0.0
+    }
+
+    fun calculateMaxY(maxValue: Float?, yStep: Double): Double? {
+        maxValue ?: return null
+        return ceil(maxValue / yStep) * yStep + if (ceil(maxValue / yStep) == maxValue / yStep) yStep else 0.0
+    }
+
+    fun applyMovingAverageTransform(listOfValues: List<Float>): List<Float> {
+        return listOfValues.mapIndexed { index, initialValue ->
+            val transformedValue = when (index) {
+                0, listOfValues.lastIndex -> {
+                    initialValue
+                }
+                1, listOfValues.lastIndex - 1 -> {
+                    (listOfValues[index - 1] + initialValue + listOfValues[index + 1]) / 3f
+                }
+                else -> {
+                    (listOfValues[index - 2] + listOfValues[index - 1] + initialValue + listOfValues[index + 1] + listOfValues[index + 2]) / 5f
+                }
+            }
+
+            transformedValue
+        }
+    }
+
+    private inline fun <T> T.transformIf(predicate: Boolean, block: (T) -> T): T {
+        return if(predicate) block(this) else this
+    }
 }
 
 data class GraphUiState(
     val graphType: GraphType = GraphType.UNSPECIFIED,
+    val graphsData: GraphsData = GraphsData(),
 
-    val dateSelected: LocalDate = StatsTimeUtils().today(),
+    val dateSelected: LocalDate = StatsTimeUtils().currentDate(),
     val graphIntervalSelected: GraphInterval = GraphInterval.DAY_GRAPH,
     val isSelectGraphTypeButtonClicked: Boolean = false,
     val isSelectDateButtonClicked: Boolean = false,
-
-    val isFahrenheit: Boolean? = null,
 
     val scrollState: VicoScrollState = VicoScrollState(),
     val zoomState: VicoZoomState = VicoZoomState(
@@ -236,30 +354,25 @@ data class GraphUiState(
     )
 )
 
+data class GraphsData(
+    val graphDataOfLevel: GraphData = GraphData(),
+    val graphDataOfVoltage: GraphData = GraphData(),
+    val graphDataOfTemperature: GraphData = GraphData(),
+)
+
 data class GraphData(
-    val graphDataOfLevel: GraphDataOfLevel = GraphDataOfLevel(),
-    val graphDataOfVoltage: GraphDataOfVoltage = GraphDataOfVoltage(),
-    val graphDataOfTemperature: GraphDataOfTemperature = GraphDataOfTemperature(),
+    val graphType: GraphType = GraphType.UNSPECIFIED,
 
-    val isFahrenheit: Boolean = false,
-    val isMovingAverageForVoltageGraphEnabled: Boolean = true,
-    val isCutmullRomCurveEnabled: Boolean = true,
-)
+    val listOfTimestamps: List<Float> = emptyList(),
+    val listOfValues: List<Float> = emptyList(),
 
-data class GraphDataOfTemperature(
-    val listOfTimestampedBatteryTemp: List<TimestampedBatteryTemp> = emptyList(),
-    val globalMinOfTemperature: Float? = null,
-    val globalMaxOfTemperature: Float? = null,
-)
+    val yStep: Double? = null,
 
-data class GraphDataOfVoltage(
-    val listOfTimestampedBatteryVoltage: List<TimestampedBatteryVoltage> = emptyList(),
-    val globalMinOfVoltage: Float? = null,
-    val globalMaxOfVoltage: Float? = null,
-)
+    val minY: Double? = null,
+    val maxY: Double? = null,
 
-data class GraphDataOfLevel(
-    val listOfTimestampedBatteryLevel: List<TimestampedBatteryLevel> = emptyList(),
-    val globalMinOfLevel: Int = 0,
-    val globalMaxOfLevel: Int = 100
+    val startAxisValueFormatter: (value: Double) -> String = {""},
+    val bottomAxisValueFormatter: (value: Double) -> String = {""},
+
+    val interpolator: LineCartesianLayer.Interpolator = LineCartesianLayer.Interpolator.Sharp
 )

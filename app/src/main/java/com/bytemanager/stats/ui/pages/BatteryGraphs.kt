@@ -44,8 +44,8 @@ fun BatteryGraphs(
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 val statsTimeUtils = StatsTimeUtils()
-                val selectedDate = statsTimeUtils.millisToLocalDate(utcTimeMillis) ?: return false
-                val today = statsTimeUtils.today()
+                val selectedDate = statsTimeUtils.epochMillisToLocalDate(utcTimeMillis) ?: return false
+                val today = statsTimeUtils.currentDate()
 
                 return selectedDate.isBefore(today) || selectedDate == today
             }
@@ -56,10 +56,10 @@ fun BatteryGraphs(
 
     val date =  graphUiState.dateSelected
     val isSelectDateButtonClicked = graphUiState.isSelectDateButtonClicked
-
-    val graphData by batteryGraphsViewModel.stateFlowOfGraphData.collectAsState()
     val scrollState = graphUiState.scrollState
     val zoomState = graphUiState.zoomState
+
+    val graphsData = graphUiState.graphsData
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -102,17 +102,17 @@ fun BatteryGraphs(
         ) {
             DayWiseLineGraph(
                 graphName = stringResource(R.string.battery_level_graph_label),
-                graphData,
+                graphsData,
                 GraphType.LEVEL,
                 scrollState = scrollState,
-                zoomState = zoomState
+                zoomState = zoomState,
             )
 
             Spacer(Modifier.height(40.dp))
 
             DayWiseLineGraph(
                 graphName = stringResource(R.string.battery_temperature_graph_label),
-                graphData,
+                graphsData,
                 GraphType.TEMPERATURE,
                 scrollState = scrollState,
                 zoomState = zoomState
@@ -122,7 +122,7 @@ fun BatteryGraphs(
 
             DayWiseLineGraph(
                 graphName = stringResource(R.string.battery_voltage_graph_label),
-                graphData,
+                graphsData,
                 GraphType.VOLTAGE,
                 scrollState = scrollState,
                 zoomState = zoomState
@@ -189,7 +189,7 @@ private fun SelectedDateLabel(
     onPrevButtonClick: () -> Unit,
     onNextButtonClick: () -> Unit
 ) {
-    val today by remember { mutableStateOf(StatsTimeUtils().today()) }
+    val today by remember { mutableStateOf(StatsTimeUtils().currentDate()) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -24,7 +24,7 @@ class ThermalStateRepository @Inject constructor(
         val powerManager = appContext.getSystemService(PowerManager::class.java)
         trySend(
             TimestampedThermalState(
-                timestamp = StatsTimeUtils().nowInTimestamp(),
+                timestamp = StatsTimeUtils().currentEpochSecond(),
                 throttlingStatus = powerManager.currentThermalStatus
             )
         )
@@ -33,7 +33,7 @@ class ThermalStateRepository @Inject constructor(
             Log.d("PowerStateRepository", "thermalStatus changed to ${ThermalStateRepositoryUtils.getThermalThrottlingStatusVerbose(status)}")
             trySend(
                 TimestampedThermalState(
-                    timestamp = StatsTimeUtils().nowInTimestamp(),
+                    timestamp = StatsTimeUtils().currentEpochSecond(),
                     throttlingStatus = status
                 )
             )

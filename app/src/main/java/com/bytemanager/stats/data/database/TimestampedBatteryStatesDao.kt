@@ -6,10 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.bytemanager.stats.data.types.TimestampedRawBatteryLevel
 import com.bytemanager.stats.data.types.TimestampedRawBatteryState
-import com.bytemanager.stats.data.types.TimestampedRawBatteryTemp
-import com.bytemanager.stats.data.types.TimestampedRawBatteryVoltage
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -58,15 +55,6 @@ interface TimestampedBatteryStatesDao {
     fun getFromTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimestampedRawBatteryState>>
 
 
-
-    @Query("SELECT timestamp, level, scale FROM timestampedBatteryStates where timestamp >= :startTimestamp and timestamp < :endTimestamp")
-    fun getListOfTimestampedRawBatteryLevelFromTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimestampedRawBatteryLevel>>
-
-    @Query("SELECT timestamp, temperature FROM timestampedBatteryStates where timestamp >= :startTimestamp and timestamp < :endTimestamp")
-    fun getListOfTimestampedRawBatteryTempFromTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimestampedRawBatteryTemp>>
-
-    @Query("SELECT timestamp, voltage FROM timestampedBatteryStates where timestamp >= :startTimestamp and timestamp < :endTimestamp")
-    fun getListOfTimestampedRawBatteryVoltageFromTimestampRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TimestampedRawBatteryVoltage>>
 
 
     @Query("SELECT MIN(voltage) FROM timestampedBatteryStates")

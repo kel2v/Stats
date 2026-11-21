@@ -32,6 +32,7 @@ class StatsLogger @Inject constructor(
 
     suspend fun startStatsLogger() {
         Log.d("StatsLogger", "StatsLogger started")
+        StatsNotificationManager.createStatsNotificationChannel(appContext)
         logger()
     }
 

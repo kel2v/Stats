@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bytemanager.stats.R
 import com.bytemanager.stats.data.types.GraphType
-import com.bytemanager.stats.ui.pages.GraphData
+import com.bytemanager.stats.ui.pages.GraphsData
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.VicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.VicoZoomState
@@ -34,56 +34,29 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.common.Fill
-import java.util.Locale
-import kotlin.math.ceil
-import kotlin.math.floor
 
 @Composable
 fun DayWiseLineGraph(
     graphName: String,
-    graphData: GraphData,
+    graphsData: GraphsData,
     graphType: GraphType,
     scrollState: VicoScrollState,
     zoomState: VicoZoomState
 ) {
-    var xList: List<Float>
-    var yList: List<Float>
-    var minValue: Float?
-    var maxValue: Float?
-
-    var minY: Double
-    var maxY: Double
-    var yStep: Double
-
-    when (graphType) {
-        GraphType.LEVEL -> {
-            xList = graphData.graphDataOfLevel.listOfTimestampedBatteryLevel.map { it.timestamp.toFloat() }
-            yList = graphData.graphDataOfLevel.listOfTimestampedBatteryLevel.map { it.level.toFloat() }
-
-            minValue = graphData.graphDataOfLevel.globalMinOfLevel.toFloat()
-            maxValue = graphData.graphDataOfLevel.globalMaxOfLevel.toFloat()
-
-        }
-        GraphType.VOLTAGE -> {
-            xList = graphData.graphDataOfVoltage.listOfTimestampedBatteryVoltage.map { it.timestamp.toFloat() }
-            yList = graphData.graphDataOfVoltage.listOfTimestampedBatteryVoltage.map { it.voltage }
-
-            minValue = graphData.graphDataOfVoltage.globalMinOfVoltage
-            maxValue = graphData.graphDataOfVoltage.globalMaxOfVoltage
-
-        }
-        GraphType.TEMPERATURE -> {
-            xList = graphData.graphDataOfTemperature.listOfTimestampedBatteryTemp.map { it.timestamp.toFloat() }
-            yList = graphData.graphDataOfTemperature.listOfTimestampedBatteryTemp.map { it.temperature }
-
-            minValue = graphData.graphDataOfTemperature.globalMinOfTemperature
-            maxValue = graphData.graphDataOfTemperature.globalMaxOfTemperature
-        }
-        else -> {
-            return
-        }
+    val graphData = when(graphType) {
+        GraphType.LEVEL -> graphsData.graphDataOfLevel
+        GraphType.TEMPERATURE -> graphsData.graphDataOfTemperature
+        GraphType.VOLTAGE -> graphsData.graphDataOfVoltage
+        GraphType.UNSPECIFIED -> return
     }
 
+    val xList = graphData.listOfTimestamps
+    val yList = graphData.listOfValues
+
+    val minY = graphData.minY
+    val maxY = graphData.maxY
+
+    val yStep = graphData.yStep
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -106,8 +79,8 @@ fun DayWiseLineGraph(
         if(
             xList.isEmpty() ||
             yList.isEmpty() ||
-            minValue == null ||
-            maxValue == null
+            minY == null ||
+            maxY == null
         ) {
             Text(
                 text = stringResource(R.string.no_data_found),
@@ -117,59 +90,7 @@ fun DayWiseLineGraph(
             return
         }
 
-        when (graphType) {
-            GraphType.LEVEL -> {
-                minY = minValue.toDouble()
-                maxY = maxValue.toDouble()
-
-                yStep = 5.0
-            }
-            GraphType.VOLTAGE -> {
-                minY = floor(minValue / 0.1) * 0.1 - 0.1
-                maxY = ceil(maxValue / 0.1) * 0.1 + 0.1
-
-                yStep = 0.1
-            }
-            else -> {
-                minY =
-                    floor(minValue / 5.0) * 5.0 - if (floor(minValue / 5.0) == minValue / 5.0) 5.0 else 0.0
-                maxY =
-                    ceil(maxValue / 5.0) * 5.0 + if (ceil(maxValue / 5.0) == maxValue / 5.0) 5.0 else 0.0
-
-                yStep = 5.0
-            }
-        }
-
-        if(graphType == GraphType.TEMPERATURE && graphData.isFahrenheit) {
-            yList = yList.map { (it * 1.8f) + 32f }
-
-            minY = (minY * 1.8f) + 32
-            maxY = (maxY * 1.8f) + 32
-
-            minY = floor(minY / 10) * 10
-            maxY = ceil(maxY / 10) * 10
-
-            yStep = 10.0
-        }
-
         val modelProducer = remember { CartesianChartModelProducer() }
-
-        if(graphData.isMovingAverageForVoltageGraphEnabled) {
-            val smoothenedYList: List<Float> = yList.mapIndexed { index, f ->
-                val value = if(index == 0 || index == yList.lastIndex) {
-                    f
-                } else if(index == 1 || index == yList.lastIndex-1) {
-                    (yList[index-1] + f + yList[index+1])/3f
-                }
-                else {
-                    (yList[index-2] + yList[index-1] + f + yList[index+1] + yList[index+2])/5f
-                }
-
-                value
-            }
-
-            yList = smoothenedYList
-        }
 
         LaunchedEffect(graphData) {
             modelProducer.runTransaction {
@@ -196,7 +117,7 @@ fun DayWiseLineGraph(
                                             Brush.verticalGradient(listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), Color.Transparent))
                                         )
                                     ),
-                                interpolator = if(graphData.isCutmullRomCurveEnabled) LineCartesianLayer.Interpolator.catmullRom() else LineCartesianLayer.Interpolator.Sharp,
+                                interpolator = graphData.interpolator,
                             )
                         ),
                     rangeProvider = CartesianLayerRangeProvider.fixed(
@@ -209,28 +130,12 @@ fun DayWiseLineGraph(
                 startAxis = VerticalAxis.rememberStart(
                     itemPlacer = VerticalAxis.ItemPlacer.step({yStep}),
                     valueFormatter = {_, value, _ ->
-                        when (graphType) {
-                            GraphType.TEMPERATURE -> {
-                                "${value.toInt()} °${if(graphData.isFahrenheit)"F" else "C"}"
-                            }
-                            GraphType.LEVEL -> {
-                                "${value.toInt()} %"
-                            }
-                            GraphType.VOLTAGE -> {
-                                "${
-                                    String.format(
-                                        locale = Locale.getDefault(), 
-                                        format = "%.1f", 
-                                        value
-                                    )
-                                } V"
-                            }
-                        }
+                        graphData.startAxisValueFormatter(value)
                     }
                 ),
                 bottomAxis = HorizontalAxis.rememberBottom(
                     valueFormatter = {_, value, _ ->
-                        "${(value/3600).toInt()}:00"
+                        graphData.bottomAxisValueFormatter(value)
                     },
                 ),
                 getXStep = { _, _, _ ->
@@ -240,8 +145,7 @@ fun DayWiseLineGraph(
             modelProducer = modelProducer,
             scrollState = scrollState,
             zoomState = zoomState,
-            modifier = Modifier
-                .padding(horizontal = 2.dp),
+            modifier = Modifier.padding(horizontal = 2.dp),
             chartAreaHeight = 400.dp
         )
     }

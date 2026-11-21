@@ -98,7 +98,7 @@ class ErrorHandler @Inject constructor(
         message: String
     ): ErrorMessage {
         return ErrorMessage(
-            time = StatsTimeUtils().nowInLocalTime(),
+            time = StatsTimeUtils().currentTime(),
             originFunctionName = function,
             errorType = error,
             message = message
