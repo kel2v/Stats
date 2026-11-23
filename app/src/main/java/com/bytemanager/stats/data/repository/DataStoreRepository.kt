@@ -12,11 +12,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,6 +34,7 @@ class DataStoreRepository @Inject constructor(
         val IS_AUTOSTART_LOGGING_SERVICE_ENABLED = booleanPreferencesKey("is_autostart_logging_service_enabled")
         val SHOW_GETTING_STARTED = booleanPreferencesKey("show_getting_started")
         val NOTIFICATION_ICON_INFO_PREFERENCE = intPreferencesKey("notification_icon_info_preference")
+        val SHOULD_NOTIFY_BATTERY_INFO_UPDATES = booleanPreferencesKey("should_notify_battery_info_updates")
     }
 
     val flowOfSettings = dataStore.data.map { preferences ->
@@ -49,32 +47,13 @@ class DataStoreRepository @Inject constructor(
             isIgnoringBatteryOptimizations = preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] ?: false,
             isAutostartLoggingServiceEnabled = preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false,
             showQuickSetup = preferences[Keys.SHOW_GETTING_STARTED] ?: true,
-            notificationIconInfoPreference = preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] ?: NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal
+            notificationIconInfoPreference = preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] ?: NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal,
+            shouldNotifyBatteryInfoUpdates = preferences[Keys.SHOULD_NOTIFY_BATTERY_INFO_UPDATES] ?: true
         )
 
         Log.d("DataStoreRepository", "emitted new Settings value: $e")
 
         e
-    }
-
-    fun getStateFlowOfSettings(scope: CoroutineScope): StateFlow<Settings> {
-        return flowOfSettings.stateIn(
-            scope = scope,
-            started = SharingStarted.Eagerly,
-            initialValue = Settings()
-        )
-    }
-
-    suspend fun isDataLoggingEnabled(): Boolean {
-        return dataStore.data.map {
-            it[Keys.IS_DATA_LOGGING_ENABLED] ?: false
-        }.first()
-    }
-
-    suspend fun setDataLogging(value: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[Keys.IS_DATA_LOGGING_ENABLED] = value
-        }
     }
 
     suspend fun toggleDataLogging() {
@@ -87,35 +66,11 @@ class DataStoreRepository @Inject constructor(
         }
     }
 
-
-
-
-
-    suspend fun isNotificationsEnabled(): Boolean {
-        return dataStore.data.map { preferences ->
-            preferences[Keys.IS_NOTIFICATIONS_ENABLED] ?: false
-        }.first()
-    }
-
     suspend fun setIsNotificationsEnabled(value: Boolean) {
         dataStore.edit { preferences ->
             preferences[Keys.IS_NOTIFICATIONS_ENABLED] = value
         }
     }
-
-    suspend fun toggleNotificationEnabled() {
-        val currentValue = dataStore.data.map { preferences ->
-            preferences[Keys.IS_NOTIFICATIONS_ENABLED] ?: false
-        }.first()
-
-        dataStore.edit { current ->
-            current[Keys.IS_NOTIFICATIONS_ENABLED] = !currentValue
-        }
-    }
-
-
-
-
 
     suspend fun toggleFahrenheitChoice() {
         val currentValue = dataStore.data.map { preferences ->
@@ -126,10 +81,6 @@ class DataStoreRepository @Inject constructor(
             current[Keys.IS_FAHRENHEIT] = !currentValue
         }
     }
-
-
-
-
 
     suspend fun toggleIsMovingAverageForVoltageGraphEnabledChoice() {
         val currentValue = dataStore.data.map { preferences ->
@@ -151,26 +102,16 @@ class DataStoreRepository @Inject constructor(
         }
     }
 
-    suspend fun isIgnoringBatteryOptimizations(): Boolean {
-        return dataStore.data.map { preferences ->
-            preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] ?: false
-        }.first()
-    }
-
     suspend fun setIsIgnoringBatteryOptimizations(value: Boolean) {
         dataStore.edit { preferences ->
             preferences[Keys.IS_IGNORING_BATTERY_OPTIMIZATIONS] = value
         }
     }
 
-    suspend fun isAutostartLoggingServiceChoice(): Boolean {
-        return dataStore.data.map { preferences ->
+    suspend fun toggleIsAutostartLoggingServiceChoice() {
+        val initialValue = dataStore.data.map { preferences ->
             preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] ?: false
         }.first()
-    }
-
-    suspend fun toggleIsAutostartLoggingServiceChoice() {
-        val initialValue = isAutostartLoggingServiceChoice()
 
         dataStore.edit { preferences ->
             preferences[Keys.IS_AUTOSTART_LOGGING_SERVICE_ENABLED] = !initialValue
@@ -183,22 +124,20 @@ class DataStoreRepository @Inject constructor(
         }
     }
 
-    suspend fun showGettingStarted(): Boolean {
-        return dataStore.data.map { preferences ->
-            preferences[Keys.SHOW_GETTING_STARTED] ?: true
-        }.first()
-    }
-
     suspend fun setNotificationIconInfoPreference(value: NotificationIconInfoType) {
         dataStore.edit { preferences ->
             preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] = value.ordinal
         }
     }
 
-    suspend fun getNotificationIconInfoPreference(): Int {
-        return dataStore.data.map { preferences ->
-            preferences[Keys.NOTIFICATION_ICON_INFO_PREFERENCE] ?: NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal
+    suspend fun toggleNotifyBatteryInfoUpdates() {
+        val initialValue = dataStore.data.map { preferences ->
+            preferences[Keys.SHOULD_NOTIFY_BATTERY_INFO_UPDATES] ?: true
         }.first()
+
+        dataStore.edit { preferences ->
+            preferences[Keys.SHOULD_NOTIFY_BATTERY_INFO_UPDATES] = !initialValue
+        }
     }
 }
 
@@ -212,6 +151,7 @@ data class Settings(
     val isAutostartLoggingServiceEnabled: Boolean = false,
     val showQuickSetup: Boolean = false,
     val notificationIconInfoPreference: Int = NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal,
+    val shouldNotifyBatteryInfoUpdates: Boolean = false
 )
 
 enum class NotificationIconInfoType {

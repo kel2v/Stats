@@ -33,7 +33,8 @@ class SettingsViewModel @Inject constructor(
             isCutmullRomCurveEnabled = settings.isCutmullRomCurveEnabled,
             isIgnoringBatteryOptimizations = settings.isIgnoringBatteryOptimizations,
             isAutostartLoggingServiceEnabled = settings.isAutostartLoggingServiceEnabled,
-            selectedNotificationIconInfo = settings.notificationIconInfoPreference
+            selectedNotificationIconInfo = settings.notificationIconInfoPreference,
+            shouldNotifyBatteryInfoUpdates = settings.shouldNotifyBatteryInfoUpdates
         )
     }.stateIn(
         scope = viewModelScope,
@@ -99,6 +100,12 @@ class SettingsViewModel @Inject constructor(
             dataStoreRepository.setNotificationIconInfoPreference(choice)
         }
     }
+
+    fun toggleNotifyBatteryInfoUpdates() {
+        viewModelScope.launch {
+            dataStoreRepository.toggleNotifyBatteryInfoUpdates()
+        }
+    }
 }
 
 data class SettingsUiState(
@@ -109,5 +116,6 @@ data class SettingsUiState(
     val isCutmullRomCurveEnabled: Boolean = true,
     val isIgnoringBatteryOptimizations: Boolean = false,
     val isAutostartLoggingServiceEnabled: Boolean = false,
-    val selectedNotificationIconInfo: Int = NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal
+    val selectedNotificationIconInfo: Int = NotificationIconInfoType.BATTERY_TEMPERATURE.ordinal,
+    val shouldNotifyBatteryInfoUpdates: Boolean = false
 )

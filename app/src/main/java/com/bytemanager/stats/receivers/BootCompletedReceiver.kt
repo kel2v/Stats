@@ -9,6 +9,7 @@ import com.bytemanager.stats.services.notification.StatsLoggingService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,13 +25,12 @@ class BootCompletedReceiver: BroadcastReceiver() {
         if(intent.action == Intent.ACTION_LOCKED_BOOT_COMPLETED) {
             val pendingResult = goAsync()
             CoroutineScope(Dispatchers.Default).launch {
-                val isAutostartLoggingServiceEnabled = dataStoreRepository.isAutostartLoggingServiceChoice()
-                Log.d("BootCompletedReceiver", "isAutostartLoggingServiceEnabled = $isAutostartLoggingServiceEnabled")
+                val settings = dataStoreRepository.flowOfSettings.first()
 
-                val isDataLoggingEnabled = dataStoreRepository.isDataLoggingEnabled()
-                Log.d("BootCompletedReceiver", "isDataLoggingEnabled = $isDataLoggingEnabled")
+                Log.d("BootCompletedReceiver", "isAutostartLoggingServiceEnabled = ${settings.isAutostartLoggingServiceEnabled}")
+                Log.d("BootCompletedReceiver", "isDataLoggingEnabled = ${settings.isDataLoggingEnabled}")
 
-                if(isDataLoggingEnabled && isAutostartLoggingServiceEnabled) {
+                if(settings.isDataLoggingEnabled && settings.isAutostartLoggingServiceEnabled) {
                     val serviceIntent = Intent(context, StatsLoggingService::class.java)
                     context.startForegroundService(serviceIntent)
                 }

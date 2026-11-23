@@ -166,6 +166,18 @@ fun Settings(settingsViewModel: SettingsViewModel = hiltViewModel()) {
             spacingBetweenPreferences()
 
             TogglingPreference(
+                label = stringResource(R.string.notify_battery_info_updates_preference),
+                description = stringResource(R.string.notify_battery_info_updates_preference_description),
+                isChecked = settingsUiState.shouldNotifyBatteryInfoUpdates,
+                enabled = isDataLoggingEnabled,
+                onCheckedChange = {
+                    settingsViewModel.toggleNotifyBatteryInfoUpdates()
+                }
+            )
+
+            spacingBetweenPreferences()
+
+            TogglingPreference(
                 label = stringResource(R.string.autostart_logging_on_boot_preference),
                 description = stringResource(R.string.autostart_logging_on_boot_preference_description),
                 isChecked = isAutostartLoggingServiceEnabled,

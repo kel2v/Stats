@@ -20,6 +20,7 @@ import com.bytemanager.stats.data.repository.DataStoreRepository
 import com.bytemanager.stats.services.notification.StatsLoggingService
 import com.bytemanager.stats.ui.theme.StatsTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class MainActivity: ComponentActivity() {
         Log.d("MainActivity", "running onCreate")
 
         lifecycleScope.launch {
-            if(dataStoreRepository.isDataLoggingEnabled()) {
+            if(dataStoreRepository.flowOfSettings.first().isDataLoggingEnabled) {
                 StatsLoggingService.startForegroundService(applicationContext)
             }
         }
